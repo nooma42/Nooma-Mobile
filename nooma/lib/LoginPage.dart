@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -23,6 +25,16 @@ class _LoginPageState extends State<LoginPage> {
   void submit(){
     print(emailController.text);
     print(pwdController.text);
+
+    Map<String, String> requestHeaders = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    var url = "http://10.0.2.2:9001/authenticate";
+    http.post(url, headers: requestHeaders, body: json.encode({"email": emailController.text, "pwd": pwdController.text})).then((response) {
+      print(response.body);
+    });
   }
 
   @override
