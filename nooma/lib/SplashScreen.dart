@@ -23,6 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
     print("im fire!");
     Timer(Duration(seconds: 3),goToLogin);
   }
+
   @override
   Widget build(BuildContext context) {
     final logo = Hero(

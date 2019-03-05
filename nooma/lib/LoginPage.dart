@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   static String tag = 'loginPage';
@@ -7,7 +8,23 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
+class _LoginData {
+  String email = '';
+  String pwd = '';
+}
+
 class _LoginPageState extends State<LoginPage> {
+
+  _LoginData _data = new _LoginData();
+
+  final emailController = TextEditingController(text: "");
+  final pwdController = TextEditingController(text: "");
+
+  void submit(){
+    print(emailController.text);
+    print(pwdController.text);
+  }
+
   @override
   Widget build(BuildContext context) {
     final logo = Hero(
@@ -21,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
     final email = TextFormField(
       keyboardType: TextInputType.emailAddress,
       autofocus: false,
-      initialValue: '',
+      controller: emailController,
       decoration: InputDecoration(
           hintText: 'Email',
           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -31,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
 
     final password = TextFormField(
       autofocus: false,
-      initialValue: '',
+      controller: pwdController,
       obscureText: true,
       decoration: InputDecoration(
           hintText: 'Password',
@@ -50,7 +67,9 @@ class _LoginPageState extends State<LoginPage> {
           minWidth: 200.0,
           height: 42.0,
           child: Text('Login', style: TextStyle(color: Colors.white)),
-          onPressed: () {},
+          onPressed: () {
+            submit();
+          },
           color: Colors.blueAccent,
         ),
       ),
@@ -75,7 +94,9 @@ class _LoginPageState extends State<LoginPage> {
           minWidth: 200.0,
           height: 42.0,
           child: Text('Sign Up', style: TextStyle(color: Colors.white)),
-          onPressed: () {},
+          onPressed: () {
+
+          },
           color: Colors.redAccent,
         ),
       ),
