@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-
+import 'package:nooma/ui/roomsTab.dart';
+import 'package:nooma/ui/SettingsTab.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,7 +13,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   int _currentIndex = 0;
-  final List<Widget> _children = [];
+  final List<Widget> _children = [
+    PlaceholderWidget(Colors.deepOrange),
+    SettingsTab(),
+  ];
   String username;
 
 
@@ -32,11 +36,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0, // this will be set when a new tab is tapped
+        currentIndex: _currentIndex, // this will be set when a new tab is tapped
+        onTap: onTabTapped,
         items: [
-
           BottomNavigationBarItem(
-            icon: new Icon(Icons.group),
+            icon: new Icon(Icons.message),
             title: new Text('Rooms'),
           ),
           BottomNavigationBarItem(
@@ -48,5 +52,12 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.white,
       body: _children[_currentIndex],
     );
+  }
+
+  //on changing tab, update the tab index state
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 }

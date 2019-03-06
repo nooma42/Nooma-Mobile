@@ -20,8 +20,8 @@ class _LoginPageState extends State<LoginPage> {
 
   _LoginData _data = new _LoginData();
 
-  final emailController = TextEditingController(text: "");
-  final pwdController = TextEditingController(text: "");
+  final emailController = TextEditingController(text: "tom_bradley123@hotmail.co.uk");
+  final pwdController = TextEditingController(text: "apple");
 
   void loginHandler(String response){
     Map<String, dynamic> user = jsonDecode(response);
