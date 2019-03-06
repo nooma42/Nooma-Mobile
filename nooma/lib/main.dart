@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'LoginPage.dart';
-import 'SplashScreen.dart';
+import 'ui/LoginPage.dart';
+import 'ui/SplashScreen.dart';
+import 'ui/HomePage.dart';
 
 var routes = <String, WidgetBuilder>{
-  "/login": (BuildContext context) => LoginPage(),
+  "/LoginPage": (BuildContext context) => LoginPage(),
+  "/HomePage": (BuildContext context) => HomePage(),
 };
 void main() => runApp(MyApp());
 

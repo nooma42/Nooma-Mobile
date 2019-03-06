@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:nooma/LoginPage.dart';
+import 'package:nooma/ui/LoginPage.dart';
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -20,7 +20,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    print("im fire!");
     Timer(Duration(seconds: 3),goToLogin);
   }
 
@@ -36,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.deepPurpleAccent,
+      backgroundColor: Colors.deepPurpleAccent[49],
       body: Center(
         child: ListView(
           shrinkWrap: true,

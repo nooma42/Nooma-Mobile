@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:nooma/apifunctions/requestAuthenticate.dart';
+
 
 class LoginPage extends StatefulWidget {
   static String tag = 'loginPage';
@@ -22,19 +23,16 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController(text: "");
   final pwdController = TextEditingController(text: "");
 
+  void loginHandler(String response){
+    Map<String, dynamic> user = jsonDecode(response);
+    print(user['userID']);
+  }
+
   void submit(){
     print(emailController.text);
     print(pwdController.text);
 
-    Map<String, String> requestHeaders = {
-      'Content-type': 'application/json',
-      'Accept': 'application/json',
-    };
-
-    var url = "http://10.0.2.2:9001/authenticate";
-    http.post(url, headers: requestHeaders, body: json.encode({"email": emailController.text, "pwd": pwdController.text})).then((response) {
-      print(response.body);
-    });
+    requestAuthenticate(context, emailController.text,pwdController.text);
   }
 
   @override
