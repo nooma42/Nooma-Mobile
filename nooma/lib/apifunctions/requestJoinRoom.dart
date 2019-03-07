@@ -7,13 +7,14 @@ import 'package:nooma/functions/showDialogSingleButton.dart';
 import 'dart:convert';
 import 'package:nooma/globals.dart' as globals;
 
-import 'package:nooma/models/loginModel.dart';
+import 'package:nooma/models/JoinRoomModel.dart';
 
-Future<LoginModel> requestAuthenticate(BuildContext context, String email, String password) async {
-  final url = "http://${globals.ipAddress}/authenticate";
+Future<JoinRoomModel> requestAuthenticate(BuildContext context, String userID, String joinCode) async {
+  final url = "http://${globals.ipAddress}/joinRoom";
+
   Map<String, String> body = {
-    'email': email,
-    'pwd': password,
+    'userID': userID,
+    'joinCode': joinCode,
   };
 
   Map<String, String> requestHeaders = {
@@ -30,15 +31,14 @@ Future<LoginModel> requestAuthenticate(BuildContext context, String email, Strin
   if (response.statusCode == 200) {
     final responseJson = json.decode(response.body);
 
-    saveLogin(responseJson);
-    Navigator.of(context).pushReplacementNamed('/HomePage');
+    //saveLogin(responseJson);
 
-    return LoginModel.fromJson(responseJson);
+    return JoinRoomModel.fromJson(responseJson);
   } else {
     final responseJson = json.decode(response.body);
 
     saveLogin(responseJson);
-    showDialogSingleButton(context, "Unable to Login", "You may have supplied an invalid 'Email' / 'Password' combination. Please try again.", "OK");
+    showDialogSingleButton(context, "Unable to Join Room", "You may have supplied an invalid Join Code. Please try again.", "OK");
     return null;
   }
 }

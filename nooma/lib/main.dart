@@ -4,6 +4,7 @@ import 'ui/SplashScreen.dart';
 import 'ui/HomePage.dart';
 
 var routes = <String, WidgetBuilder>{
+  "/Splash": (BuildContext context) => SplashScreen(),
   "/LoginPage": (BuildContext context) => LoginPage(),
   "/HomePage": (BuildContext context) => HomePage(),
 };

@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final logo = Hero(
-        tag: 'logo',
+        tag: 'logo1',
         child: CircleAvatar(
           backgroundColor: Colors.transparent,
           radius: 48.0,
