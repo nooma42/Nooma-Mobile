@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'ui/LoginPage.dart';
 import 'ui/SplashScreen.dart';
 import 'ui/HomePage.dart';
+import 'ui/RoomPage.dart';
 
 var routes = <String, WidgetBuilder>{
   "/Splash": (BuildContext context) => SplashScreen(),
