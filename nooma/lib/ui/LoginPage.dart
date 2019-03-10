@@ -105,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
           height: 42.0,
           child: Text('Sign Up', style: TextStyle(color: Colors.white)),
           onPressed: () {
-
+            Navigator.of(context).pushReplacementNamed('/RegisterPage');
           },
           color: Colors.redAccent,
         ),

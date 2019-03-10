@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:nooma/apifunctions/requestGetRooms.dart';
+import 'package:nooma/apifunctions/requestJoinRoom.dart';
 import 'package:nooma/functions/ListViewRooms.dart';
 import 'package:nooma/functions/joinCodeWidget.dart';
 import 'package:nooma/models/RoomModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PlaceholderWidget extends StatefulWidget {
   PlaceholderWidget();
@@ -16,12 +18,16 @@ class PlaceholderWidget extends StatefulWidget {
 class _PlaceholderWidgetState extends State<PlaceholderWidget> {
   final _joinCodeController = TextEditingController();
 
+  String userID;
+
   @override
   void initState() {
-    Future<List<RoomModel>> rooms = requestGetRooms(context, "23");
-    rooms.then((vals) {
-      print(vals.length);
-    });
+      Future<String> userId = getUserID();
+
+      userId.then((onValue) {
+        userID = onValue;
+      });
+
     super.initState();
   }
 
@@ -69,20 +75,27 @@ class _PlaceholderWidgetState extends State<PlaceholderWidget> {
       ),
     ),
                 FutureBuilder<List<RoomModel>>(
-                  future: requestGetRooms(context, "23"),
+                  future: requestGetRooms(context, userID),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) print(snapshot.error);
                     return snapshot.hasData
                         ? ListViewRooms(
                         rooms: snapshot.data) // return the ListView widget
-                        : Center(child: CircularProgressIndicator());
+                        : Center( child: CircularProgressIndicator());
                   },
                 ),
               ],
             )));
   }
 
-  void joinRoom(_joinCodeController) {
+  void joinRoom(_joinCodeController) async {
     print(_joinCodeController.text);
+    requestJoinRoom(context, userID,_joinCodeController.text);
+  }
+
+  Future<String> getUserID() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var userID = preferences.getString('userID');
+    return userID;
   }
 }

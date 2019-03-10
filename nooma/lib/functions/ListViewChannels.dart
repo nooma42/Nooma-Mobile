@@ -19,6 +19,7 @@ class ListViewChannels extends StatelessWidget {
                 children: <Widget>[
                   Divider(height: 5.0),
                   ListTile(
+                    leading: Icon(Icons.message, color: Colors.white,),
                     title: Text('${channels[position].channelName}',style: new TextStyle(
                       fontSize: 20.0,
                       color: Colors.white,

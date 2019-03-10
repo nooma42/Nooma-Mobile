@@ -7,7 +7,7 @@ class JoinRoomModel {
 
   JoinRoomModel.fromJson(Map<String, dynamic> json)
       : status = json['status'],
-        roomID = json['roomID'];
+        roomID = json['roomID'].toString();
 
   Map<String, dynamic> toJson() =>
       {

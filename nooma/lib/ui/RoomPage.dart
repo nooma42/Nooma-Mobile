@@ -15,9 +15,9 @@ class RoomPage extends StatefulWidget {
 }
 
 class _RoomPageState extends State<RoomPage> {
-
   RoomModel room;
   TabController tabController;
+  var appBarTitleText = new Text("Channel");
 
   _RoomPageState(RoomModel room);
 
@@ -35,29 +35,28 @@ class _RoomPageState extends State<RoomPage> {
     String appTitle;
 
     return Scaffold(
-        appBar: AppBar(
-      title: Text('$roomName'),
-    ),
+      appBar: AppBar(
+        title: Text('$roomName'),
+      ),
       body: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.grey[800],
-          title: Text('Channel'),
+          title: appBarTitleText,
         ),
         drawer: Drawer(
-          child:                 FutureBuilder<List<ChannelModel>>(
+          child: FutureBuilder<List<ChannelModel>>(
             future: requestGetChannels(context, room.roomID),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               return snapshot.hasData
                   ? ListViewChannels(
-                  channels: snapshot.data) // return the ListView widget
+                      channels: snapshot.data) // return the ListView widget
                   : Center(child: CircularProgressIndicator());
             },
           ),
         ),
         body: Column(
-          children: <Widget>[
-          ],
+          children: <Widget>[],
         ),
       ),
     );

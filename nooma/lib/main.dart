@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nooma/ui/RegisterPage.dart';
 import 'ui/LoginPage.dart';
 import 'ui/SplashScreen.dart';
 import 'ui/HomePage.dart';
@@ -8,6 +9,7 @@ var routes = <String, WidgetBuilder>{
   "/Splash": (BuildContext context) => SplashScreen(),
   "/LoginPage": (BuildContext context) => LoginPage(),
   "/HomePage": (BuildContext context) => HomePage(),
+  "/RegisterPage": (BuildContext context) => RegisterPage(),
 };
 void main() => runApp(MyApp());
 
