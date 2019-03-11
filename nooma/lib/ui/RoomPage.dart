@@ -2,8 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:nooma/apifunctions/requestGetChannels.dart';
 import 'package:nooma/functions/ListViewChannels.dart';
+import 'package:nooma/functions/ListViewMessages.dart';
+import 'package:nooma/functions/messageInput.dart';
 import 'package:nooma/models/ChannelModel.dart';
 import 'package:nooma/models/RoomModel.dart';
+import  'package:flutter_socket_io/flutter_socket_io.dart';
 
 class RoomPage extends StatefulWidget {
   final RoomModel room;
@@ -18,12 +21,20 @@ class _RoomPageState extends State<RoomPage> {
   RoomModel room;
   TabController tabController;
   var appBarTitleText = new Text("Channel");
+  Future<List<ChannelModel>> channels;
 
-  _RoomPageState(RoomModel room);
+  _RoomPageState(this.room);
 
   @override
   void initState() {
     super.initState();
+    channels = requestGetChannels(room.roomID);
+    channels.then((channels)
+    {
+    setState(() {
+      appBarTitleText = Text(channels[0].channelName);
+    });
+    });
   }
 
   @override
@@ -37,6 +48,7 @@ class _RoomPageState extends State<RoomPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('$roomName'),
+        backgroundColor: Colors.deepPurpleAccent,
       ),
       body: Scaffold(
         appBar: AppBar(
@@ -45,7 +57,7 @@ class _RoomPageState extends State<RoomPage> {
         ),
         drawer: Drawer(
           child: FutureBuilder<List<ChannelModel>>(
-            future: requestGetChannels(context, room.roomID),
+            future: channels,
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               return snapshot.hasData
@@ -56,7 +68,11 @@ class _RoomPageState extends State<RoomPage> {
           ),
         ),
         body: Column(
-          children: <Widget>[],
+          children: <Widget>[
+            buildListMessage(),
+            chatInput(),
+
+          ],
         ),
       ),
     );

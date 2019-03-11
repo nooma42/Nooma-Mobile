@@ -20,19 +20,28 @@ class ListViewRooms extends StatelessWidget {
                 children: <Widget>[
                   Divider(height: 5.0),
                   ListTile(
-                    title: Text('${rooms[position].roomName}',style: new TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.white,
-                    ),),
-                    subtitle: Text('Host: ${rooms[position].host}',style: new TextStyle(
-                      fontSize: 13.0,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.white,
-                    ),),
-                    trailing: Text('${rooms[position].eventDate}',style: new TextStyle(
-                      fontSize: 15.0,
-                      color: Colors.white,
-                    ),),
+                    title: Text(
+                      '${rooms[position].roomName}',
+                      style: new TextStyle(
+                        fontSize: 20.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Host: ${rooms[position].host}',
+                      style: new TextStyle(
+                        fontSize: 13.0,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.white,
+                      ),
+                    ),
+                    trailing: Text(
+                      '${rooms[position].eventDate}',
+                      style: new TextStyle(
+                        fontSize: 15.0,
+                        color: Colors.white,
+                      ),
+                    ),
                     onTap: () => _onTapItem(context, rooms[position]),
                   ),
                 ],
@@ -43,8 +52,10 @@ class ListViewRooms extends StatelessWidget {
   }
 
   void _onTapItem(BuildContext context, RoomModel room) {
-    Navigator.push(context, new MaterialPageRoute(
-      builder: (BuildContext context) => new RoomPage(room),
-    ));
+    Navigator.push(
+        context,
+        new MaterialPageRoute(
+          builder: (BuildContext context) => new RoomPage(room),
+        ));
   }
 }

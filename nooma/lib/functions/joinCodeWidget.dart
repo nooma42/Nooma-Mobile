@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
+import 'package:nooma/apifunctions/requestJoinRoom.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class JoinCodeWidget extends StatelessWidget {
 
@@ -22,7 +24,7 @@ class JoinCodeWidget extends StatelessWidget {
             icon: Icon(Icons.photo_camera),
             onPressed: () {
               //add camera here
-              openQRScanner(controller);
+              openQRScanner(context, controller);
             },
           ),
           border: OutlineInputBorder(
@@ -33,10 +35,13 @@ class JoinCodeWidget extends StatelessWidget {
 }
 
 
-  Future openQRScanner(controller) async {
+  Future openQRScanner(context, controller) async {
     try {
       String barcode = await BarcodeScanner.scan();
       controller.text = barcode;
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      var userID = preferences.getString('userID');
+      requestJoinRoom(context, userID, barcode);
     } catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
       } else {

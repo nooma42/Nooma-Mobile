@@ -5,13 +5,10 @@ import 'package:nooma/functions/showDialogSingleButton.dart';
 import 'dart:convert';
 import 'package:nooma/globals.dart' as globals;
 
-import 'package:nooma/models/ChannelModel.dart';
+import 'package:nooma/models/MessageModel.dart';
 
-Future<List<ChannelModel>> requestGetChannels(String channelID) async {
-  final url = "http://${globals.ipAddress}/channels/" +channelID;
-  print(url);
-  Map<String, String> body = {
-  };
+Future<List<MessageModel>> requestGetMessages(String channelID) async {
+  final url = "http://${globals.ipAddress}/channelMessages/" +channelID;
 
   Map<String, String> requestHeaders = {
     'Content-type': 'application/json',
@@ -26,7 +23,7 @@ Future<List<ChannelModel>> requestGetChannels(String channelID) async {
   if (response.statusCode == 200) {
     final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
 
-    return parsed.map<ChannelModel>((json) => ChannelModel.fromJson(json)).toList();
+    return parsed.map<MessageModel>((json) => MessageModel.fromJson(json)).toList();
   } else {
     final responseJson = json.decode(response.body);
     //showDialogSingleButton(context, "Unable to get Channels", "Something has gone wrong!", "OK");
