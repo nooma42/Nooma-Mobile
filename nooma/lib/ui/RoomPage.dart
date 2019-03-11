@@ -71,7 +71,6 @@ class _RoomPageState extends State<RoomPage> {
           children: <Widget>[
             buildListMessage(),
             chatInput(),
-
           ],
         ),
       ),
