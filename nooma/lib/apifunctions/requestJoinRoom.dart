@@ -59,7 +59,7 @@ Future<JoinRoomModel> requestJoinRoom(
       RoomModel room = RoomModel.fromJson(responseJson[0]);
 
       Navigator.push(context, new MaterialPageRoute(
-        builder: (BuildContext context) => new RoomPage(room),
+        builder: (BuildContext context) => new RoomPage(room,null),
       ));
     } else if (status == "Already Joined") {
       Fluttertoast.showToast(
@@ -74,7 +74,7 @@ Future<JoinRoomModel> requestJoinRoom(
       RoomModel room = RoomModel.fromJson(responseJson[0]);
 
       Navigator.push(context, new MaterialPageRoute(
-        builder: (BuildContext context) => new RoomPage(room),
+        builder: (BuildContext context) => new RoomPage(room, null),
       ));
     }
 

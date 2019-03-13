@@ -55,7 +55,7 @@ class ListViewRooms extends StatelessWidget {
     Navigator.push(
         context,
         new MaterialPageRoute(
-          builder: (BuildContext context) => new RoomPage(room),
+          builder: (BuildContext context) => new RoomPage(room,null),
         ));
   }
 }
