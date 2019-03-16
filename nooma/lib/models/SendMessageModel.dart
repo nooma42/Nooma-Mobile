@@ -1,21 +1,18 @@
-class MessageModel {
-  final String messageID;
-  final String username;
+class SendMessageModel {
+  final String userID;
   final String messageContent;
   final String sendDate;
 
-  MessageModel(this.messageID, this.username, this.messageContent, this.sendDate);
+  SendMessageModel(this.userID, this.messageContent, this.sendDate);
 
-  MessageModel.fromJson(Map<String, dynamic> json)
-      : messageID = json['messageID'].toString(),
-        username = json['username'],
+  SendMessageModel.fromJson(Map<String, dynamic> json)
+      : userID = json['userID'].toString(),
         messageContent = json['messageContent'],
         sendDate = json['sendDate'];
 
   Map<String, dynamic> toJson() =>
       {
-        'messageID': messageID,
-        'username': username,
+        'userID': userID,
         'messageContent': messageContent,
         'sendDate': sendDate,
       };

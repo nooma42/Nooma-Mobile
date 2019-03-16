@@ -12,12 +12,13 @@ import 'package:nooma/models/MessageModel.dart';
 import 'package:flutter_socket_io/flutter_socket_io.dart';
 import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:nooma/globals.dart' as globals;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RoomPage extends StatefulWidget {
   final RoomModel room;
-  final List<MessageModel> messages;
+  final List<MessageModel> messags;
 
-  RoomPage(this.room, this.messages);
+  RoomPage(this.room, this.messags);
 
   @override
   _RoomPageState createState() => _RoomPageState(room);
@@ -30,6 +31,13 @@ class _RoomPageState extends State<RoomPage> {
   Future<List<ChannelModel>> channels;
   SocketIO socketIO;
   Future<List<MessageModel>> messages;
+  List<MessageModel> msgCache = new List<MessageModel>();
+
+  ScrollController _scrollController = new ScrollController();
+
+  SharedPreferences prefs;
+
+  String userID;
 
   _RoomPageState(this.room);
 
@@ -51,21 +59,27 @@ class _RoomPageState extends State<RoomPage> {
     //socketIO.handlerMethodCall("chat", _onReceiveChatMessage, '{"messageContent": "hello"}');
     //connect socket
     socketIO.connect();
-
     String jsonData = '{"channelID": "$channelID"}';
-    socketIO.sendMessage("channel", jsonData, _onReceiveChatMessage);
+    print(jsonData);
+    socketIO.sendMessage("channel", jsonData, _onChannelJoin);
   }
 
   @override
   void initState() {
     super.initState();
+    readLocal();
     channels = requestGetChannels(room.roomID);
     channels.then((channels) {
       setState(() {
         appBarTitleText = Text(channels[0].channelName);
       });
-      messages = requestGetMessages(channels[0].channelID);
       _connectSocket(channels[0].channelID);
+      messages = requestGetMessages(channels[0].channelID);
+      messages.then((msgs) {
+        setState(() {
+          msgCache = msgs;
+        });
+      });
     });
   }
 
@@ -102,16 +116,16 @@ class _RoomPageState extends State<RoomPage> {
         body: Column(
           children: <Widget>[
             Flexible(
-              child: FutureBuilder<List<MessageModel>>(
-                future: messages,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) print(snapshot.error);
-                  return snapshot.hasData
-                      ? ListViewMessages(
-                          messages: snapshot.data) // return the ListView widget
-                      : Center(child: CircularProgressIndicator());
-                },
-              ),
+              child: Container(
+                  color: Color(0xff2A2237),
+                  child: ListView.builder(
+                    itemCount: msgCache.length,
+                    controller: _scrollController,
+                    reverse: true,
+                    padding: const EdgeInsets.all(15.0),
+                    itemBuilder: (context, position) =>
+                        buildMessage(position, msgCache[position]),
+                  )), // return the ListView widget
             ),
             Container(
               child: Row(
@@ -168,18 +182,82 @@ class _RoomPageState extends State<RoomPage> {
     print("Socket status: " + data);
   }
 
+  void _onChannelJoin(dynamic message) {
+    print("*** connection:" + message + " ***");
+  }
+
   void _onReceiveChatMessage(dynamic message) {
     Map msgMap = jsonDecode(message);
     MessageModel newMsg = MessageModel.fromJson(msgMap);
 
     print(newMsg.messageContent);
-    Fluttertoast.showToast(
-        msg: newMsg.messageContent,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIos: 2,
-        backgroundColor: Colors.greenAccent,
-        textColor: Colors.white,
-        fontSize: 16.0);
+    msgCache.insert(0, newMsg);
+    setState(() {});
+    _scrollController.animateTo(
+      0.0,
+      curve: Curves.easeOut,
+      duration: const Duration(milliseconds: 500),
+    );
+  }
+
+  buildMessage(int position, MessageModel msg) {
+    if(userID == msg.userID) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          Divider(height: 5.0),
+          Container(
+            width: 300.0,
+            padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+            margin: EdgeInsets.only(bottom: 20.0 , right: 10.0),
+            decoration: BoxDecoration(color: Colors.purpleAccent,
+                borderRadius: BorderRadius.circular(8.0)),
+            child: Text(
+                '${msg.messageContent}',
+                style: new TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.white,
+                ),
+              ),
+          ),
+        ],
+      );
+    }
+    else
+      {
+        return Row(
+          children: <Widget>[
+            Divider(height: 5.0),
+            Container(
+              width: 300,
+              padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+              margin: EdgeInsets.only(bottom: 20.0 , right: 10.0),
+              decoration: BoxDecoration(color: Colors.blueAccent,
+                  borderRadius: BorderRadius.circular(8.0)),
+              child: ListTile(
+                title: Text(
+                  '${msg.username}',
+                  style: new TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+                subtitle: Text(
+                  '${msg.messageContent}',
+                  style: new TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      }
+  }
+
+  readLocal() async {
+    prefs = await SharedPreferences.getInstance();
+    userID = prefs.getString('userID') ?? '';
   }
 }
