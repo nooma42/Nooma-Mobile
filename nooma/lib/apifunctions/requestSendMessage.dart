@@ -8,16 +8,20 @@ import 'package:nooma/globals.dart' as globals;
 import 'package:nooma/models/MessageModel.dart';
 import 'package:nooma/models/SendMessageModel.dart';
 
-Future<List<SendMessageModel>> requestGetMessages(String channelID) async {
-  final url = "http://${globals.ipAddress}/channelMessages/" +channelID;
+void requestSendMessage(SendMessageModel sendMsg) async {
+  final url = "http://${globals.ipAddress}/channelMessages/" + sendMsg.channelID;
 
   Map<String, String> requestHeaders = {
     'Content-type': 'application/json',
     'Accept': 'application/json',
   };
 
-  final response = await http.get(
+  Map<String, dynamic> body = sendMsg.toJson();
+  print("^&^ " + json.encode(body));
+
+  final response = await http.post(
     url,
+    body: json.encode(body),
     headers: requestHeaders,
   );
 

@@ -4,15 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nooma/apifunctions/requestGetChannels.dart';
 import 'package:nooma/apifunctions/requestGetMessages.dart';
+import 'package:nooma/apifunctions/requestSendMessage.dart';
 import 'package:nooma/functions/ListViewChannels.dart';
 import 'package:nooma/functions/ListViewMessages.dart';
 import 'package:nooma/models/ChannelModel.dart';
 import 'package:nooma/models/RoomModel.dart';
 import 'package:nooma/models/MessageModel.dart';
-import 'package:flutter_socket_io/flutter_socket_io.dart';
-import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:nooma/globals.dart' as globals;
+import 'package:nooma/models/SendMessageModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+import 'package:adhara_socket_io/adhara_socket_io.dart';
 
 class RoomPage extends StatefulWidget {
   final RoomModel room;
@@ -29,7 +31,10 @@ class _RoomPageState extends State<RoomPage> {
   TabController tabController;
   var appBarTitleText = new Text("Channel");
   Future<List<ChannelModel>> channels;
-  SocketIO socketIO;
+
+  SocketIO socket;
+  SocketIOManager manager;
+
   Future<List<MessageModel>> messages;
   List<MessageModel> msgCache = new List<MessageModel>();
 
@@ -39,29 +44,49 @@ class _RoomPageState extends State<RoomPage> {
 
   String userID;
 
+  TextEditingController _messageController = new TextEditingController();
+
+  ChannelModel currentChannel;
+
   _RoomPageState(this.room);
 
-  _connectSocket(channelID) {
+  _connectSocket() async {
     //update your domain before using
     /*socketIO = new SocketIO("http://127.0.0.1:3000", "/chat",
         query: "userId=21031", socketStatusCallback: _socketStatus);*/
-    socketIO = SocketIOManager().createSocketIO(
-        "http://${globals.ipAddress}", "/",
-        socketStatusCallback: _socketStatus);
-    //call init socket before doing anything
-    socketIO.init();
 
-    //subscribe event
-    //socketIO.subscribe("socket_info", _onSocketInfo);
-    //socketIO.subscribe(channelID, _onReceiveChatMessage);
-    socketIO.subscribe("chat", _onReceiveChatMessage);
+    socket = await manager.createInstance(
+        "http://${globals.ipAddress}",
+        query: {
+          "auth": "--SOME AUTH STRING---",
+          "info": "new connection from adhara-socketio",
+          "timestamp": DateTime.now().toString()
+        },
+        //Enable or disable platform channel logging
+        enableLogging: false
+    );
 
-    //socketIO.handlerMethodCall("chat", _onReceiveChatMessage, '{"messageContent": "hello"}');
-    //connect socket
-    socketIO.connect();
-    String jsonData = '{"channelID": "$channelID"}';
-    print(jsonData);
-    socketIO.sendMessage("channel", jsonData, _onChannelJoin);
+    socket.onConnect((data) {
+      print("connected...");
+      print(data);
+      connectChannel(currentChannel.channelID);
+    });
+
+
+    //socketIO.connect().then((onValue){
+      //String jsonData = '{"channelID": "$channelID"}';
+      //socketIO.sendMessage("channel", jsonData, _onChannelJoin);
+    //});
+
+    //String jsonData = '{"channelID": "$channelID"}';
+   // socketIO.sendMessage("channel", jsonData, _onChannelJoin);
+    //socketIO.subscribe("chat", _onReceiveChatMessage);
+
+    socket.on("chat", (data){
+      print("recieved chat!");
+      _onReceiveChatMessage(data);
+    });
+    socket.connect();
   }
 
   @override
@@ -70,11 +95,13 @@ class _RoomPageState extends State<RoomPage> {
     readLocal();
     channels = requestGetChannels(room.roomID);
     channels.then((channels) {
+      currentChannel = channels[0];
       setState(() {
-        appBarTitleText = Text(channels[0].channelName);
+        appBarTitleText = Text(currentChannel.channelName);
       });
-      _connectSocket(channels[0].channelID);
-      messages = requestGetMessages(channels[0].channelID);
+      manager = SocketIOManager();
+      _connectSocket();
+      messages = requestGetMessages(currentChannel.channelID);
       messages.then((msgs) {
         setState(() {
           msgCache = msgs;
@@ -137,6 +164,7 @@ class _RoomPageState extends State<RoomPage> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: TextField(
+                          controller: _messageController,
                           style: TextStyle(color: Colors.black, fontSize: 15.0),
                           decoration: InputDecoration.collapsed(
                             hintText: 'Type your message...',
@@ -154,9 +182,14 @@ class _RoomPageState extends State<RoomPage> {
                       child: new IconButton(
                         icon: new Icon(Icons.send),
                         onPressed: () {
-                          String jsonData =
-                              '{"messageContent": "Hello! im a telephone :)"}';
-                          socketIO.sendMessage("chat", jsonData);
+                          String msgContents = _messageController.text;
+                          _messageController.text = "";
+                          DateTime now = DateTime.now();
+                          String formattedDate = DateFormat('dd/MM/yy kk:mm').format(now);
+                          print("***** " + userID);
+                          SendMessageModel sendMsg = SendMessageModel(userID,currentChannel.channelID, msgContents,formattedDate);
+                          print(sendMsg.userID);
+                          requestSendMessage(sendMsg);
                         },
                         color: Colors.black,
                       ),
@@ -187,8 +220,8 @@ class _RoomPageState extends State<RoomPage> {
   }
 
   void _onReceiveChatMessage(dynamic message) {
-    Map msgMap = jsonDecode(message);
-    MessageModel newMsg = MessageModel.fromJson(msgMap);
+    print(message);
+    MessageModel newMsg = MessageModel.fromJson(message);
 
     print(newMsg.messageContent);
     msgCache.insert(0, newMsg);
@@ -196,7 +229,7 @@ class _RoomPageState extends State<RoomPage> {
     _scrollController.animateTo(
       0.0,
       curve: Curves.easeOut,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 1000),
     );
   }
 
@@ -260,4 +293,14 @@ class _RoomPageState extends State<RoomPage> {
     prefs = await SharedPreferences.getInstance();
     userID = prefs.getString('userID') ?? '';
   }
+
+  void connectChannel(String channelID) {
+    if (socket != null) {
+      print("connecting to channel...");
+      socket.emit("channel",[{"channelID": "$channelID"}]);
+    }
+  }
+
 }
+
+
