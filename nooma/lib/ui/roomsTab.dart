@@ -73,7 +73,10 @@ class _PlaceholderWidgetState extends State<PlaceholderWidget> {
             return snapshot.hasData
                 ? ListViewRooms(
                     rooms: snapshot.data) // return the ListView widget
-                : Center(child: CircularProgressIndicator());
+                : Expanded(
+                child: Container(
+                color: Color(0xff2A2237),
+            child:Center(child: CircularProgressIndicator())));
           },
         ),
       ],

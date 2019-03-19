@@ -23,6 +23,8 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController(text: "tom_bradley123@hotmail.co.uk");
   final pwdController = TextEditingController(text: "apple");
 
+  bool _isButtonDisabled = false;
+
   void loginHandler(String response){
     Map<String, dynamic> user = jsonDecode(response);
     print(user['userID']);
@@ -32,7 +34,12 @@ class _LoginPageState extends State<LoginPage> {
     print(emailController.text);
     print(pwdController.text);
 
-    requestAuthenticate(context, emailController.text,pwdController.text);
+    requestAuthenticate(context, emailController.text,pwdController.text).then((onValue)
+    {
+      setState(() {
+        _isButtonDisabled = false;
+      });
+    });
   }
 
   @override
@@ -69,19 +76,22 @@ class _LoginPageState extends State<LoginPage> {
 
     final loginButton = Padding(
       padding: EdgeInsets.symmetric(vertical: 0.0),
-      child: Material(
-        borderRadius: BorderRadius.circular(30.0),
-        shadowColor: Colors.lightBlueAccent,
-        child: MaterialButton(
+      child: MaterialButton(
           elevation: 1.0,
-          minWidth: 200.0,
+          minWidth: _isButtonDisabled ? 200 : 100,
           height: 42.0,
-          child: Text('Login', style: TextStyle(color: Colors.white)),
+          child: _isButtonDisabled ? CircularProgressIndicator(valueColor: new AlwaysStoppedAnimation<Color>(
+              Colors.white
+          )
+          ) :
+          Text("Login", style: TextStyle(color: Colors.white)),
           onPressed: () {
-            submit();
-          },
-          color: Colors.blueAccent,
-        ),
+            _isButtonDisabled ? null : submit();
+            setState(() {
+              _isButtonDisabled = true;
+            });
+            },
+          color: _isButtonDisabled ? Colors.grey : Colors.blueAccent,
       ),
     );
 
