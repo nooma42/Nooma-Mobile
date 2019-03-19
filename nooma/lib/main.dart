@@ -12,9 +12,10 @@ var routes = <String, WidgetBuilder>{
   "/HomePage": (BuildContext context) => HomePage(),
   "/RegisterPage": (BuildContext context) => RegisterPage(),
 };
-void main() => runApp(MyApp());
+void main() => runApp(Nooma());
 
-class MyApp extends StatelessWidget {
+class Nooma extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
 

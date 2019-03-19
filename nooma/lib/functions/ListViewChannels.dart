@@ -34,5 +34,6 @@ class ListViewChannels extends StatelessWidget {
 
   void _onTapItem(BuildContext context, ChannelModel room) {
     print(room.channelID);
+
   }
 }

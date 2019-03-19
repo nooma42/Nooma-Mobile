@@ -31,6 +31,7 @@ class _RoomPageState extends State<RoomPage> {
   TabController tabController;
   var appBarTitleText = new Text("Channel");
   Future<List<ChannelModel>> channels;
+  List<ChannelModel> channelsCache;
 
   SocketIO socket;
   SocketIOManager manager;
@@ -48,6 +49,8 @@ class _RoomPageState extends State<RoomPage> {
 
   ChannelModel currentChannel;
 
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
+
   _RoomPageState(this.room);
 
   _connectSocket() async {
@@ -55,16 +58,14 @@ class _RoomPageState extends State<RoomPage> {
     /*socketIO = new SocketIO("http://127.0.0.1:3000", "/chat",
         query: "userId=21031", socketStatusCallback: _socketStatus);*/
 
-    socket = await manager.createInstance(
-        "http://${globals.ipAddress}",
+    socket = await manager.createInstance("http://${globals.ipAddress}",
         query: {
           "auth": "--SOME AUTH STRING---",
           "info": "new connection from adhara-socketio",
           "timestamp": DateTime.now().toString()
         },
         //Enable or disable platform channel logging
-        enableLogging: false
-    );
+        enableLogging: false);
 
     socket.onConnect((data) {
       print("connected...");
@@ -72,17 +73,16 @@ class _RoomPageState extends State<RoomPage> {
       connectChannel(currentChannel.channelID);
     });
 
-
     //socketIO.connect().then((onValue){
-      //String jsonData = '{"channelID": "$channelID"}';
-      //socketIO.sendMessage("channel", jsonData, _onChannelJoin);
+    //String jsonData = '{"channelID": "$channelID"}';
+    //socketIO.sendMessage("channel", jsonData, _onChannelJoin);
     //});
 
     //String jsonData = '{"channelID": "$channelID"}';
-   // socketIO.sendMessage("channel", jsonData, _onChannelJoin);
+    // socketIO.sendMessage("channel", jsonData, _onChannelJoin);
     //socketIO.subscribe("chat", _onReceiveChatMessage);
 
-    socket.on("chat", (data){
+    socket.on("chat", (data) {
       print("recieved chat!");
       _onReceiveChatMessage(data);
     });
@@ -94,20 +94,44 @@ class _RoomPageState extends State<RoomPage> {
     super.initState();
     readLocal();
     channels = requestGetChannels(room.roomID);
-    channels.then((channels) {
-      currentChannel = channels[0];
+    channels.then((chnls) {
+      channelsCache = chnls;
+      currentChannel = chnls[0];
       setState(() {
         appBarTitleText = Text(currentChannel.channelName);
+        _scaffoldKey.currentState.openDrawer();
       });
       manager = SocketIOManager();
       _connectSocket();
-      messages = requestGetMessages(currentChannel.channelID);
-      messages.then((msgs) {
-        setState(() {
-          msgCache = msgs;
-        });
+      getMessages();
+    });
+  }
+
+  @override
+  void dispose() {
+    manager.clearInstance(socket);
+    super.dispose();
+  }
+
+
+  getMessages(){
+    messages = requestGetMessages(currentChannel.channelID);
+    messages.then((msgs) {
+      setState(() {
+        msgCache = msgs;
       });
     });
+  }
+  _onTapItem(BuildContext context, ChannelModel selectedChannel) {
+    currentChannel = selectedChannel;
+    msgCache = new List<MessageModel>();
+    getMessages();
+    setState(() {
+      appBarTitleText = Text(currentChannel.channelName);
+    });
+    //_connectSocket();
+    connectChannel(currentChannel.channelID);
+    Navigator.pop(context);
   }
 
   @override
@@ -124,6 +148,7 @@ class _RoomPageState extends State<RoomPage> {
         backgroundColor: Colors.deepPurpleAccent,
       ),
       body: Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           backgroundColor: Colors.grey[800],
           title: appBarTitleText,
@@ -134,8 +159,34 @@ class _RoomPageState extends State<RoomPage> {
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               return snapshot.hasData
-                  ? ListViewChannels(
-                      channels: snapshot.data) // return the ListView widget
+                  ? Container(
+                      color: Color(0xff2A2237),
+                      child: ListView.builder(
+                          itemCount: channelsCache.length,
+                          padding: const EdgeInsets.all(15.0),
+                          itemBuilder: (context, position) {
+                            return Column(
+                              children: <Widget>[
+                                Divider(height: 5.0),
+                                ListTile(
+                                  leading: Icon(
+                                    Icons.message,
+                                    color: Colors.white,
+                                  ),
+                                  title: Text(
+                                    '${channelsCache[position].channelName}',
+                                    style: new TextStyle(
+                                      fontSize: 20.0,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  onTap: () => _onTapItem(
+                                      context, channelsCache[position]),
+                                ),
+                              ],
+                            );
+                          }),
+                    ) // return the ListView widget
                   : Center(child: CircularProgressIndicator());
             },
           ),
@@ -185,9 +236,14 @@ class _RoomPageState extends State<RoomPage> {
                           String msgContents = _messageController.text;
                           _messageController.text = "";
                           DateTime now = DateTime.now();
-                          String formattedDate = DateFormat('dd/MM/yy kk:mm').format(now);
+                          String formattedDate =
+                              DateFormat('dd/MM/yy kk:mm:ss').format(now);
                           print("***** " + userID);
-                          SendMessageModel sendMsg = SendMessageModel(userID,currentChannel.channelID, msgContents,formattedDate);
+                          SendMessageModel sendMsg = SendMessageModel(
+                              userID,
+                              currentChannel.channelID,
+                              msgContents,
+                              formattedDate);
                           print(sendMsg.userID);
                           requestSendMessage(sendMsg);
                         },
@@ -234,7 +290,7 @@ class _RoomPageState extends State<RoomPage> {
   }
 
   buildMessage(int position, MessageModel msg) {
-    if(userID == msg.userID) {
+    if (userID == msg.userID) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
@@ -242,51 +298,51 @@ class _RoomPageState extends State<RoomPage> {
           Container(
             width: 300.0,
             padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-            margin: EdgeInsets.only(bottom: 20.0 , right: 10.0),
-            decoration: BoxDecoration(color: Colors.purpleAccent,
+            margin: EdgeInsets.only(bottom: 20.0, right: 10.0),
+            decoration: BoxDecoration(
+                color: Colors.deepPurple[300],
                 borderRadius: BorderRadius.circular(8.0)),
             child: Text(
+              '${msg.messageContent}',
+              style: new TextStyle(
+                fontSize: 16.0,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: <Widget>[
+          Divider(height: 5.0),
+          Container(
+            width: 300,
+            padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+            margin: EdgeInsets.only(bottom: 20.0, right: 10.0),
+            decoration: BoxDecoration(
+                color: Colors.teal[400],
+                borderRadius: BorderRadius.circular(8.0)),
+            child: ListTile(
+              title: Text(
+                '${msg.username}',
+                style: new TextStyle(
+                  fontSize: 20.0,
+                  color: Colors.white,
+                ),
+              ),
+              subtitle: Text(
                 '${msg.messageContent}',
                 style: new TextStyle(
                   fontSize: 16.0,
                   color: Colors.white,
                 ),
               ),
+            ),
           ),
         ],
       );
     }
-    else
-      {
-        return Row(
-          children: <Widget>[
-            Divider(height: 5.0),
-            Container(
-              width: 300,
-              padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-              margin: EdgeInsets.only(bottom: 20.0 , right: 10.0),
-              decoration: BoxDecoration(color: Colors.blueAccent,
-                  borderRadius: BorderRadius.circular(8.0)),
-              child: ListTile(
-                title: Text(
-                  '${msg.username}',
-                  style: new TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-                subtitle: Text(
-                  '${msg.messageContent}',
-                  style: new TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      }
   }
 
   readLocal() async {
@@ -297,10 +353,9 @@ class _RoomPageState extends State<RoomPage> {
   void connectChannel(String channelID) {
     if (socket != null) {
       print("connecting to channel...");
-      socket.emit("channel",[{"channelID": "$channelID"}]);
+      socket.emit("channel", [
+        {"channelID": "$channelID"}
+      ]);
     }
   }
-
 }
-
-

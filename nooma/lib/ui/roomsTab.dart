@@ -44,15 +44,7 @@ class _PlaceholderWidgetState extends State<PlaceholderWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text(
-                'Quick Join',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-              ),
+
               Padding(
                 padding: const EdgeInsets.fromLTRB(100, 10, 100, 0),
                 child: JoinCodeWidget(_joinCodeController),

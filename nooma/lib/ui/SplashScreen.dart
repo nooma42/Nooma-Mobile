@@ -14,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void goToLogin()
   {
     print("im fired!");
-    Navigator.of(context).pushNamed("/LoginPage");
+    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
   @override
@@ -27,11 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final logo = Hero(
         tag: 'logo1',
-        child: CircleAvatar(
-          backgroundColor: Colors.transparent,
-          radius:98.0,
           child: Image.asset('assets/logo.png'),
-        )
     );
 
 
