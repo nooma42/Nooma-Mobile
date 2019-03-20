@@ -14,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void goToLogin()
   {
     print("im fired!");
-    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+    Navigator.of(context).pushReplacementNamed('/LoginPage');
   }
 
   @override

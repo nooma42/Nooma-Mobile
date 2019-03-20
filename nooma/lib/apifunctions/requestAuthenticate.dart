@@ -26,7 +26,7 @@ Future<LoginModel> requestAuthenticate(BuildContext context, String email, Strin
       url,
       body: json.encode(body),
       headers: requestHeaders,
-    ).timeout(const Duration(seconds: 5));
+    ).timeout(const Duration(seconds: 7));
 
     if (response.statusCode == 200) {
       if (response.body == "Error")

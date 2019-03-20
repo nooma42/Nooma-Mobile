@@ -23,6 +23,7 @@ class Nooma extends StatelessWidget {
       statusBarColor: Colors.purple[900],
     ));
 
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,

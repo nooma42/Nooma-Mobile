@@ -19,6 +19,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final pwdController = TextEditingController(text: "");
   final pwdConfirmController = TextEditingController(text: "");
 
+  bool _autoValidate = false;
+
   void registerHandler(String response){
     Map<String, dynamic> user = jsonDecode(response);
     print(user['userID']);
@@ -45,6 +47,12 @@ class _RegisterPageState extends State<RegisterPage> {
       keyboardType: TextInputType.text,
       autofocus: false,
       controller: firstNameController,
+      autovalidate: _autoValidate,
+      validator: (value) {
+        if (value.length == 0) {
+          return ('Please enter your First Name.');
+        }
+      },
       decoration: InputDecoration(
           hintText: 'First Name',
           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -56,6 +64,12 @@ class _RegisterPageState extends State<RegisterPage> {
       keyboardType: TextInputType.text,
       autofocus: false,
       controller: lastNameController,
+      autovalidate: _autoValidate,
+      validator: (value) {
+        if (value.length == 0) {
+          return ('Please enter your Last Name.');
+        }
+      },
       decoration: InputDecoration(
           hintText: 'Last Name',
           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -67,6 +81,18 @@ class _RegisterPageState extends State<RegisterPage> {
       keyboardType: TextInputType.emailAddress,
       autofocus: false,
       controller: emailController,
+      autovalidate: true,
+      validator: (value) {
+        RegExp regExp = new RegExp(
+          r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
+          caseSensitive: false,
+          multiLine: false,
+        );
+        if(!regExp.hasMatch(value))
+          {
+            return "Please enter a valid email address.";
+          }
+      },
       decoration: InputDecoration(
           hintText: 'Email',
           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -79,6 +105,12 @@ class _RegisterPageState extends State<RegisterPage> {
       autofocus: false,
       controller: pwdController,
       obscureText: true,
+      autovalidate: _autoValidate,
+      validator: (value) {
+        if (value.length < 8) {
+          return ('Your password must be at least 8 characters.');
+        }
+      },
       decoration: InputDecoration(
           hintText: 'Password',
           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -90,6 +122,12 @@ class _RegisterPageState extends State<RegisterPage> {
       autofocus: false,
       controller: pwdConfirmController,
       obscureText: true,
+      autovalidate: _autoValidate,
+      validator: (value) {
+        if (value != pwdController.text) {
+          return ('Entered Passwords do not match');
+        }
+      },
       decoration: InputDecoration(
           hintText: 'Confirm Password',
           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -97,20 +135,14 @@ class _RegisterPageState extends State<RegisterPage> {
           OutlineInputBorder(borderRadius: BorderRadius.circular(16.0))),
     );
 
-    final createButton = Material(
-      borderRadius: BorderRadius.circular(30.0),
-      shadowColor: Colors.lightBlueAccent,
-      child: MaterialButton(
-        elevation: 1.0,
-        minWidth: double.infinity,
-        height: 42.0,
-        child: Text('Create Account', style: TextStyle(color: Colors.white)),
+    final createButton = Container(height: 60, child: RaisedButton(
+        child: Text('Create Account', style: TextStyle(color: Colors.white, fontSize: 16)),
+      shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
         onPressed: () {
           submit();
         },
-        color: Colors.blueAccent,
-      ),
-    );
+        color: Colors.deepPurple[400],
+      ));
 
 
 
@@ -118,28 +150,32 @@ class _RegisterPageState extends State<RegisterPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text("Register"),
+        backgroundColor: Colors.deepPurple,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: ListView(
-          children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    SizedBox(height: 15.0),
-                    firstName,
-                    SizedBox(height: 15.0),
-                    lastName,
-                    SizedBox(height: 15.0),
-                    email,
-                    SizedBox(height: 15.0),
-                    password,
-                    SizedBox(height: 15.0),
-                    confirmPassword,
-                    SizedBox(height: 25.0),
-                    createButton,
-                  ],
-                ),
-              ],
+      body: Container(
+        color: Colors.white, //Color(0xff1E1D23),
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: ListView(
+            children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      SizedBox(height: 15.0),
+                      firstName,
+                      SizedBox(height: 15.0),
+                      lastName,
+                      SizedBox(height: 15.0),
+                      email,
+                      SizedBox(height: 15.0),
+                      password,
+                      SizedBox(height: 15.0),
+                      confirmPassword,
+                      SizedBox(height: 25.0),
+                      createButton,
+                    ],
+                  ),
+                ],
+          ),
         ),
       ),
     );
