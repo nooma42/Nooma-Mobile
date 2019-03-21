@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nooma/ui/LoginPage.dart';
 class SplashScreen extends StatefulWidget {
   @override
@@ -13,12 +14,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void goToLogin()
   {
-    print("im fired!");
     Navigator.of(context).pushReplacementNamed('/LoginPage');
   }
 
   @override
   void initState() {
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
     super.initState();
     Timer(Duration(seconds: 3),goToLogin);
   }
@@ -33,8 +34,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
     return Scaffold(
       backgroundColor: Colors.deepPurpleAccent[49],
-      body: Center(
-        child: ListView(
+      body:  Container(
+        decoration: BoxDecoration(
+        color: Color(0xff1E1D23),
+    ),
+    child: Center(
+        child:ScrollConfiguration(
+    behavior:overscrollDisable(),
+    child: ListView(
           shrinkWrap: true,
           padding: EdgeInsets.only(left: 24.0, right: 24.0),
           children: <Widget>[
@@ -42,6 +49,6 @@ class _SplashScreenState extends State<SplashScreen> {
           ],
         ),
       ),
-    );
+    )));
   }
 }

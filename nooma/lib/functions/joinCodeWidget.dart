@@ -15,6 +15,12 @@ class JoinCodeWidget extends StatelessWidget {
     return TextFormField(
       autofocus: false,
       controller: controller,
+      autovalidate: false,
+      validator: (value) {
+        if (value.length != 8) {
+          return ('Invalid Join Code');
+        }
+      },
       decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,

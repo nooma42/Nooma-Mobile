@@ -17,13 +17,12 @@ void requestSendMessage(SendMessageModel sendMsg) async {
   };
 
   Map<String, dynamic> body = sendMsg.toJson();
-  print("^&^ " + json.encode(body));
 
   final response = await http.post(
     url,
     body: json.encode(body),
     headers: requestHeaders,
-  );
+  ).timeout(const Duration(seconds: 7));
 
   if (response.statusCode == 200) {
     final parsed = json.decode(response.body).cast<Map<String, dynamic>>();

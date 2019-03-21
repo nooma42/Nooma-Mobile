@@ -20,6 +20,8 @@ class _PlaceholderWidgetState extends State<PlaceholderWidget> {
 
   String userID;
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     Future<String> userId = getUserID();
@@ -37,33 +39,38 @@ class _PlaceholderWidgetState extends State<PlaceholderWidget> {
         body: SafeArea(
             child: Column(
       children: <Widget>[
-        Container(
-          color: Colors.deepPurpleAccent,
-          height: 150.0,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
+        Form(
+          key: _formKey,
+          child: Container(
+            color: Colors.deepPurple[400],
+            height: 150.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
 
-              Padding(
-                padding: const EdgeInsets.fromLTRB(100, 10, 100, 0),
-                child: JoinCodeWidget(_joinCodeController),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 5.0),
-                child: MaterialButton(
-                  elevation: 1.0,
-                  minWidth: 200.0,
-                  height: 42.0,
-                  child:
-                      Text('Join Room', style: TextStyle(color: Colors.black)),
-                  onPressed: () {
-                    joinRoom(_joinCodeController);
-                  },
-                  color: Colors.tealAccent,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(100, 10, 100, 0),
+                  child: JoinCodeWidget(_joinCodeController),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5.0),
+                  child: MaterialButton(
+                    elevation: 1.0,
+                    minWidth: 200.0,
+                    height: 42.0,
+                    child:
+                        Text('Join Room', style: TextStyle(color: Colors.black)),
+                    onPressed: () {
+                      if (_formKey.currentState.validate()) {
+                        joinRoom(_joinCodeController);
+                      }
+                    },
+                    color: Colors.greenAccent,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         FutureBuilder<List<RoomModel>>(

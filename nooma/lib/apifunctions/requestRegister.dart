@@ -27,41 +27,56 @@ Future<JoinRoomModel> requestRegister(BuildContext context, String firstName,
     'Content-type': 'application/json',
     'Accept': 'application/json',
   };
+  try {
+    final response = await http.post(
+      url,
+      body: json.encode(body),
+      headers: requestHeaders,
+    ).timeout(const Duration(seconds: 7));
 
-  final response = await http.post(
-    url,
-    body: json.encode(body),
-    headers: requestHeaders,
-  );
+    if (response.statusCode == 200) {
+      final responseJson = json.decode(response.body);
+      print(responseJson);
 
-  if (response.statusCode == 200) {
-    final responseJson = json.decode(response.body);
-    print(responseJson);
+      final status = JoinRoomModel
+          .fromJson(responseJson[0])
+          .status;
 
-    final status = JoinRoomModel.fromJson(responseJson[0]).status;
+      if (status == "Success") {
+        Fluttertoast.showToast(
+            msg: "  Registration Successful! Please Login  ",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIos: 2,
+            backgroundColor: Colors.white,
+            textColor: Colors.black,
+            fontSize: 16.0
+        );
+        Navigator.push(context, new MaterialPageRoute(
+          builder: (BuildContext context) => new LoginPage(),
+        ));
+      }
 
-    if (status == "Success") {
-      Fluttertoast.showToast(
-          msg: "Registration Successful!\nPlease Login",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIos: 2,
-          backgroundColor: Colors.greenAccent,
-          textColor: Colors.white,
-          fontSize: 16.0
-      );
-      Navigator.push(context, new MaterialPageRoute(
-        builder: (BuildContext context) => new LoginPage(),
-      ));
+      return null;
+    } else {
+      final responseJson = json.decode(response.body);
+
+      saveLogin(responseJson);
+      showDialogSingleButton(context, "Unable to Register",
+          "Something has gone wrong when registering.", "OK");
+      return null;
     }
-
-    return null;
-  } else {
-    final responseJson = json.decode(response.body);
-
-    saveLogin(responseJson);
-    showDialogSingleButton(context, "Unable to Register",
-        "Something has gone wrong when registering.", "OK");
+  }
+  on TimeoutException catch (_) {
+    showDialogSingleButton(context, "Unable to Connect",
+        "Connection to the server could not be made. Please try again.",
+        "OK");
+  }
+  catch (e)
+  {
+    print(e);
     return null;
   }
+
 }
+

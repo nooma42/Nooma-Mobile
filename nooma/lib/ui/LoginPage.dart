@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nooma/apifunctions/requestAuthenticate.dart';
 
-
 class overscrollDisable extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
@@ -31,7 +30,12 @@ class _LoginPageState extends State<LoginPage> {
       TextEditingController(text: "tom_bradley123@hotmail.co.uk");
   final pwdController = TextEditingController(text: "apple");
 
+  FocusNode emailFocusNode = new FocusNode();
+  FocusNode passwordFocusNode = new FocusNode();
+
   bool _isButtonDisabled = false;
+
+  final _formKey = GlobalKey<FormState>();
 
   void loginHandler(String response) {
     Map<String, dynamic> user = jsonDecode(response);
@@ -61,30 +65,52 @@ class _LoginPageState extends State<LoginPage> {
         ));
 
     final email = Theme(
-      data: new ThemeData(
-        primaryColor: Colors.purpleAccent,
-        primaryColorDark: Colors.purple,
-      ),
-      child : TextFormField(
-      keyboardType: TextInputType.emailAddress,
-      autofocus: false,
-      controller: emailController,
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 18,
-      ),
-      decoration: InputDecoration(
-          hintText: 'Email',
-          filled: true,
-          fillColor: Color(0xff353242),
-          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.0),
-            borderSide: const BorderSide(color: Colors.white, width: 0.0,),
+        data: new ThemeData(
+          primaryColor: Colors.purpleAccent,
+          primaryColorDark: Colors.purple,
+        ),
+        child: TextFormField(
+          keyboardType: TextInputType.emailAddress,
+          autofocus: false,
+          controller: emailController,
+          focusNode: emailFocusNode,
+          validator: (value) {
+            if (value.length == 0) {
+              return ('Please enter your email address');
+            }
+          },
+          textInputAction: TextInputAction.next,
+          onFieldSubmitted: (term) {
+            FocusScope.of(context).requestFocus(passwordFocusNode);
+          },
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
           ),
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(16.0))),
-    ));
+          decoration: InputDecoration(
+              prefixIcon: Icon(
+                Icons.account_circle,
+                color: Colors.white,
+              ),
+              hintStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontStyle: FontStyle.italic,
+              ),
+              hintText: 'Email',
+              filled: true,
+              fillColor: Color(0xff353242),
+              contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.0),
+                borderSide: const BorderSide(
+                  color: Colors.white,
+                  width: 0.0,
+                ),
+              ),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.0))),
+        ));
 
     final password = Theme(
         data: new ThemeData(
@@ -93,46 +119,68 @@ class _LoginPageState extends State<LoginPage> {
         ),
         child: TextFormField(
           autofocus: false,
+          focusNode: passwordFocusNode,
+          textInputAction: TextInputAction.done,
+          validator: (value) {
+            if (value.length == 0) {
+              return ('Please enter your password');
+            }
+          },
           style: TextStyle(
             color: Colors.white,
-            fontSize: 18,
+            fontSize: 17,
+            fontStyle: FontStyle.italic,
           ),
           controller: pwdController,
           obscureText: true,
           decoration: InputDecoration(
+              prefixIcon: Icon(
+                Icons.lock,
+                color: Colors.white,
+              ),
+              hintStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+              ),
               hintText: 'Password',
               filled: true,
               fillColor: Color(0xff353242),
               contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16.0),
-                borderSide: const BorderSide(color: Colors.white, width: 0.0,),
+                borderSide: const BorderSide(
+                  color: Colors.white,
+                  width: 0.0,
+                ),
               ),
-              border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(16.0))),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.0))),
         ));
 
     final loginButton = Padding(
-      padding: EdgeInsets.symmetric(vertical: 0.0),
-      child: Container(
-        height: 60,
-        child: RaisedButton(
-        elevation: 1.0,
-            shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-        child: _isButtonDisabled
-            ? CircularProgressIndicator(
-                valueColor: new AlwaysStoppedAnimation<Color>(Colors.white))
-            : Text("Login", style: TextStyle(color: Colors.white, fontSize: 17)),
-        onPressed: () {
-          _isButtonDisabled ? null : submit();
-          setState(() {
-            _isButtonDisabled = true;
-          });
-        },
-        color: _isButtonDisabled ? Colors.grey : Colors.deepPurple[400],
-      ),
-        )
-    );
+        padding: EdgeInsets.symmetric(vertical: 0.0),
+        child: Container(
+          height: 60,
+          child: RaisedButton(
+            elevation: 1.0,
+            shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(30.0)),
+            child: _isButtonDisabled
+                ? CircularProgressIndicator(
+                    valueColor: new AlwaysStoppedAnimation<Color>(Colors.white))
+                : Text("Login",
+                    style: TextStyle(color: Colors.white, fontSize: 17)),
+            onPressed: () {
+              if (_formKey.currentState.validate()) {
+                _isButtonDisabled ? null : submit();
+                setState(() {
+                  _isButtonDisabled = true;
+                });
+              }
+            },
+            color: _isButtonDisabled ? Colors.grey : Colors.deepPurple[400],
+          ),
+        ));
 
     final forgotLabel = FlatButton(
       child: Text(
@@ -144,18 +192,18 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     final signupButton = Padding(
-
       padding: EdgeInsets.symmetric(vertical: 0.0),
       child: Container(
         height: 60,
         child: FlatButton(
           color: Color(0xff1E1D23),
-          shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-          child: Text('Don\'t have an account? Sign Up', style: TextStyle(color: Colors.white,fontSize: 16)),
+          shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(30.0)),
+          child: Text('Don\'t have an account? Sign Up',
+              style: TextStyle(color: Colors.white, fontSize: 16)),
           onPressed: () {
             Navigator.of(context).pushNamed('/RegisterPage');
           },
-
         ),
       ),
     );
@@ -177,31 +225,34 @@ class _LoginPageState extends State<LoginPage> {
         child: Container(
           decoration: BoxDecoration(
             color: Color(0xff1E1D23),
-        ),
+          ),
           child: Center(
             child: ScrollConfiguration(
-              behavior:overscrollDisable(),
-              child: ListView(
-                shrinkWrap: true,
-                padding: EdgeInsets.all(24.0),
-                children: <Widget>[
-                  logo,
-                  SizedBox(height: 48.0),
-                  email,
-                  SizedBox(height: 10.0),
-                  password,
-                  SizedBox(height: 4.0),
-                  forgotLabel,
-                  SizedBox(height: 5.0),
-                  loginButton,
-                  SizedBox(height: 15.0),
-                  signupButton
-                ],
+              behavior: overscrollDisable(),
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.all(24.0),
+                  children: <Widget>[
+                    logo,
+                    SizedBox(height: 48.0),
+                    email,
+                    SizedBox(height: 10.0),
+                    password,
+                    SizedBox(height: 4.0),
+                    forgotLabel,
+                    SizedBox(height: 5.0),
+                    loginButton,
+                    SizedBox(height: 15.0),
+                    signupButton
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
     );
-    }
+  }
 }
