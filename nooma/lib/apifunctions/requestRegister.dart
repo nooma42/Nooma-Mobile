@@ -56,7 +56,11 @@ Future<JoinRoomModel> requestRegister(BuildContext context, String firstName,
           builder: (BuildContext context) => new LoginPage(),
         ));
       }
-
+      else if (status == "emailTaken")
+        {
+          showDialogSingleButton(context, "Email Taken",
+              "This email has already been accociated with an account. Please try a new email or login.", "OK");
+        }
       return null;
     } else {
       final responseJson = json.decode(response.body);

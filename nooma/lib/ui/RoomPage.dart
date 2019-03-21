@@ -91,15 +91,16 @@ class _RoomPageState extends State<RoomPage> {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(_onLayoutDone);
     super.initState();
     readLocal();
+
     channels = requestGetChannels(room.roomID);
     channels.then((chnls) {
       channelsCache = chnls;
       currentChannel = chnls[0];
       setState(() {
         appBarTitleText = Text(currentChannel.channelName);
-        _scaffoldKey.currentState.openDrawer();
       });
       manager = SocketIOManager();
       _connectSocket();
@@ -357,5 +358,9 @@ class _RoomPageState extends State<RoomPage> {
         {"channelID": "$channelID"}
       ]);
     }
+  }
+
+  void _onLayoutDone(Duration timeStamp) {
+    _scaffoldKey.currentState.openDrawer();
   }
 }

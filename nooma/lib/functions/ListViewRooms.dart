@@ -27,7 +27,7 @@ class ListViewRooms extends StatelessWidget {
                     children: <Widget>[
                       Divider(height: 5.0),
                       ListTile(
-                        leading: const Icon(Icons.comment, size:50, color:Colors.white),
+                        leading: const Icon(Icons.group, size:50, color:Colors.white),
                         title: Text(
                           '${rooms[position].roomName}',
                           style: new TextStyle(
