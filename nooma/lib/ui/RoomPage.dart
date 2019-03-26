@@ -27,6 +27,10 @@ class RoomPage extends StatefulWidget {
 }
 
 class _RoomPageState extends State<RoomPage> {
+
+
+  var selectedIndex = 0;
+
   RoomModel room;
   TabController tabController;
   var appBarTitleText = new Text("Channel");
@@ -179,13 +183,13 @@ class _RoomPageState extends State<RoomPage> {
                                       ListTile(
                                         leading: Icon(
                                           Icons.message,
-                                          color: Colors.white,
+                                          color: currentChannel == channelsCache[position]  ? Colors.purple[200] : Colors.white,
                                         ),
                                         title: Text(
                                           '${channelsCache[position].channelName}',
                                           style: new TextStyle(
                                             fontSize: 20.0,
-                                            color: Colors.white,
+                                            color: currentChannel == channelsCache[position] ? Colors.purple[200] : Colors.white,
                                           ),
                                         ),
                                         onTap: () => _onTapItem(
@@ -228,10 +232,10 @@ class _RoomPageState extends State<RoomPage> {
                         padding: const EdgeInsets.only(left: 10),
                         child: TextField(
                           controller: _messageController,
-                          style: TextStyle(color: Colors.white, fontSize: 15.0),
+                          style: TextStyle(color: Colors.white, fontSize: 16.0),
                           decoration: InputDecoration.collapsed(
                             hintText: 'Type your message...',
-                            hintStyle: TextStyle(color: Colors.white),
+                            hintStyle: TextStyle(fontSize: 16, color: Colors.white),
                           ),
                         ),
                       ),
