@@ -13,10 +13,18 @@ saveLogin(Map responseJSON) async {
       username = "";
   }
   var userID = (responseJSON != null && responseJSON.isNotEmpty) ? LoginModel.fromJson(responseJSON).userID : "0";
+  var name = (responseJSON != null && responseJSON.isNotEmpty) ? LoginModel.fromJson(responseJSON).name: "";
+  var email = (responseJSON != null && responseJSON.isNotEmpty) ? LoginModel.fromJson(responseJSON).email: "";
+
 
   //set preferences based on values
   await preferences.setString('username', (username != null && username.length > 0) ? username : "");
   await preferences.setString('userID', (userID != null && userID.length > 0) ? userID : "");
+  await preferences.setString('name', (name != null && name.length > 0) ? name : "");
+  await preferences.setString('email', (email != null && email.length > 0) ? email : "");
+
   globals.userID = userID;
   globals.username = username;
+  globals.name = name;
+  globals.email = email;
 }

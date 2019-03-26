@@ -208,16 +208,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
 
-    final divider = SizedBox(
-      height: 1.0,
-      child: new Center(
-        child: new Container(
-          margin: new EdgeInsetsDirectional.only(start: 40.0, end: 40.0),
-          height: 1.0,
-          color: Colors.white,
-        ),
-      ),
-    );
 
     return Scaffold(
       backgroundColor: Colors.white,

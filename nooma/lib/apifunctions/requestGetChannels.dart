@@ -37,10 +37,9 @@ Future<List<ChannelModel>> requestGetChannels(BuildContext context, String chann
   }
   catch(e){
     //pop twice, one for the drawer, one for the page
-    Navigator.pop(context);
-    Navigator.pop(context);
+    Navigator.popUntil(context, ModalRoute.withName('/HomePage'));
     showDialogSingleButton(context, "Unable to Get Channels",
-        "Connection to the server could not be made. Please try again." + e.toString(),
+        "Connection to the server could not be made. Please try again.",
         "OK");
   }
 }

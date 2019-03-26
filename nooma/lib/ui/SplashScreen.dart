@@ -21,20 +21,23 @@ class _SplashScreenState extends State<SplashScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = await prefs.get('username');
     var userID = await prefs.get('userID');
+    var email = await prefs.get('email');
+    var name = await prefs.get('name');
 
     //print(username + " - " + userID);
 
     if(userID != null && userID.length > 0)
       {
-        return true;
-      }
-      if (username != null && username.length > 0)
-      {
-        return true;
-      }
+        if (username != null && username.length > 0)
+        {
+          globals.userID = userID;
+          globals.username = username;
+          globals.email = email;
+          globals.name = name;
 
-    globals.userID = userID;
-    globals.username = username;
+          return true;
+        }
+      }
       return false;
   }
   void goToLogin()
@@ -61,7 +64,6 @@ class _SplashScreenState extends State<SplashScreen> {
         tag: 'logo1',
           child: Image.asset('assets/logo.png'),
     );
-
 
     return Scaffold(
       backgroundColor: Colors.deepPurpleAccent[49],

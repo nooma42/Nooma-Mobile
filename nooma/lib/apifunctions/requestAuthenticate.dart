@@ -36,8 +36,9 @@ Future<LoginModel> requestAuthenticate(BuildContext context, String email, Strin
               "OK");
           return null;
         }
-      final responseJson = json.decode(response.body);
 
+      final responseJson = json.decode(response.body);
+      print(response.body);
       saveLogin(responseJson);
       Navigator.of(context).pushReplacementNamed('/HomePage');
 

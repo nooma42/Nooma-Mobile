@@ -14,28 +14,34 @@ Future<List<RoomModel>> requestGetRooms(BuildContext context, String userID) asy
 
   //get userID from the shared prefs to use in URL param
   SharedPreferences preferences = await SharedPreferences.getInstance();
-  var userID = preferences.getString('userID');
 
-  final url = "http://${globals.ipAddress}/studentRooms/" + userID;
-  print("url:" + url);
+  final url = "http://${globals.ipAddress}/studentRooms/" + globals.userID;
+  print("url:  " + url);
 
   Map<String, String> requestHeaders = {
     'Content-type': 'application/json',
     'Accept': 'application/json',
   };
 
-  final response = await http.get(
-    url,
-    headers: requestHeaders,
-  );
+  try {
+    final response = await http.get(
+      url,
+      headers: requestHeaders,
+    ).timeout(const Duration(seconds: 7));
 
-  if (response.statusCode == 200) {
-    final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
+    if (response.statusCode == 200) {
+      final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
 
-    return parsed.map<RoomModel>((json) => RoomModel.fromJson(json)).toList();
-
-  } else {
-    showDialogSingleButton(context, "Unable to Get Room List", "Something has gone horribly wrong!", "OK");
-    return null;
+      return parsed.map<RoomModel>((json) => RoomModel.fromJson(json)).toList();
+    } else {
+      showDialogSingleButton(context, "Unable to Get Room List",
+          "Something has gone horribly wrong!", "OK");
+      return null;
+    }
+  }
+  catch (e) {
+    showDialogSingleButton(context, "Unable to Get Room List",
+        "Something has gone horribly wrong!", "OK");
+    return new List<RoomModel>();
   }
 }

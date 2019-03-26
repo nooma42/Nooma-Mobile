@@ -39,6 +39,8 @@ class _RoomPageState extends State<RoomPage> {
   Future<List<MessageModel>> messages;
   List<MessageModel> msgCache = new List<MessageModel>();
 
+  bool isProbablyConnected = false;
+
   ScrollController _scrollController = new ScrollController();
 
   SharedPreferences prefs;
@@ -105,8 +107,7 @@ class _RoomPageState extends State<RoomPage> {
     super.dispose();
   }
 
-
-  getMessages(){
+  getMessages() {
     messages = requestGetMessages(currentChannel.channelID);
     messages.then((msgs) {
       setState(() {
@@ -114,6 +115,7 @@ class _RoomPageState extends State<RoomPage> {
       });
     });
   }
+
   _onTapItem(BuildContext context, ChannelModel selectedChannel) {
     currentChannel = selectedChannel;
     msgCache = new List<MessageModel>();
@@ -153,38 +155,51 @@ class _RoomPageState extends State<RoomPage> {
               return snapshot.hasData
                   ? Container(
                       color: Color(0xff2A2237),
-                      child: RefreshIndicator(
-                        onRefresh: _handleRefresh,
-                        child: ListView.builder(
-                            itemCount: channelsCache.length,
-                            padding: const EdgeInsets.all(15.0),
-                            itemBuilder: (context, position) {
-                              return Column(
-                                children: <Widget>[
-                                  Divider(height: 5.0),
-                                  ListTile(
-                                    leading: Icon(
-                                      Icons.message,
-                                      color: Colors.white,
-                                    ),
-                                    title: Text(
-                                      '${channelsCache[position].channelName}',
-                                      style: new TextStyle(
-                                        fontSize: 20.0,
-                                        color: Colors.white,
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20, top: 10),
+                          child: Text(
+                            "Chat Channels",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Expanded(
+                          child: RefreshIndicator(
+                            onRefresh: _handleRefresh,
+                            child: ListView.builder(
+                                itemCount: channelsCache.length,
+                                padding: const EdgeInsets.all(15.0),
+                                itemBuilder: (context, position) {
+                                  return Column(
+                                    children: <Widget>[
+                                      Divider(height: 5.0),
+                                      ListTile(
+                                        leading: Icon(
+                                          Icons.message,
+                                          color: Colors.white,
+                                        ),
+                                        title: Text(
+                                          '${channelsCache[position].channelName}',
+                                          style: new TextStyle(
+                                            fontSize: 20.0,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        onTap: () => _onTapItem(
+                                            context, channelsCache[position]),
                                       ),
-                                    ),
-                                    onTap: () => _onTapItem(
-                                        context, channelsCache[position]),
-                                  ),
-                                ],
-                              );
-                            }),
-                      ),
-                    ) // return the ListView widget
-                  :  Container(
+                                    ],
+                                  );
+                                }),
+                          ),
+                        ),
+                      ])) // return the ListView widget
+                  : Container(
                       color: Color(0xff2A2237),
-                      child:Center(child: CircularProgressIndicator()));
+                      child: Center(child: CircularProgressIndicator()));
             },
           ),
         ),

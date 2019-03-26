@@ -6,7 +6,7 @@ import 'package:nooma/apifunctions/requestJoinRoom.dart';
 import 'package:nooma/functions/ListViewRooms.dart';
 import 'package:nooma/functions/joinCodeWidget.dart';
 import 'package:nooma/models/RoomModel.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nooma/globals.dart' as globals;
 
 class PlaceholderWidget extends StatefulWidget {
   PlaceholderWidget();
@@ -24,12 +24,7 @@ class _PlaceholderWidgetState extends State<PlaceholderWidget> {
 
   @override
   void initState() {
-    Future<String> userId = getUserID();
-
-    userId.then((onValue) {
-      userID = onValue;
-    });
-
+    userID = getUserID();
     super.initState();
   }
 
@@ -100,7 +95,7 @@ class _PlaceholderWidgetState extends State<PlaceholderWidget> {
                 : Expanded(
                 child: Container(
                 color: Color(0xff2A2237),
-            child:Center(child: CircularProgressIndicator())));
+            child:Center(child: CircularProgressIndicator(backgroundColor: Colors.purple,))));
           },
         ),
       ],
@@ -112,9 +107,8 @@ class _PlaceholderWidgetState extends State<PlaceholderWidget> {
     requestJoinRoom(context, userID, _joinCodeController.text);
   }
 
-  Future<String> getUserID() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    var userID = preferences.getString('userID');
+  String getUserID() {
+    var userID = globals.userID;
     return userID;
   }
 }
