@@ -50,10 +50,9 @@ class SettingsTab extends StatelessWidget {
                   child: MaterialButton(
                     height: 50.0,
                     minWidth: 400,
-
                     color: Colors.red,
                     child:
-                        Text('Logout', style: TextStyle(fontSize: 20,letterSpacing: 0.3, color: Colors.white)),
+                        Text('Logout', style: TextStyle(fontSize: 18,letterSpacing: 0.3, color: Colors.white)),
                     onPressed: () async {
                       SharedPreferences preferences = await SharedPreferences.getInstance();
                       preferences.clear();

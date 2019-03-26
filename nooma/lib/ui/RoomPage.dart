@@ -27,13 +27,11 @@ class RoomPage extends StatefulWidget {
 }
 
 class _RoomPageState extends State<RoomPage> {
-
-
   var selectedIndex = 0;
 
   RoomModel room;
   TabController tabController;
-  var appBarTitleText = new Text("Channel");
+  var appBarTitleText = new Text("");
   Future<List<ChannelModel>> channels;
   List<ChannelModel> channelsCache = new List<ChannelModel>();
 
@@ -57,6 +55,10 @@ class _RoomPageState extends State<RoomPage> {
 
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
 
+  bool isSocketConnected = false;
+
+  var showDateIndex = 0;
+
   _RoomPageState(this.room);
 
   _connectSocket() async {
@@ -74,9 +76,14 @@ class _RoomPageState extends State<RoomPage> {
         enableLogging: false);
 
     socket.onConnect((data) {
+      setState(() => isSocketConnected = true);
       print("connected...");
       print(data);
       connectChannel(currentChannel.channelID);
+    });
+
+    socket.onDisconnect((data) {
+      setState(() => isSocketConnected = false);
     });
 
     socket.on("chat", (data) {
@@ -159,48 +166,56 @@ class _RoomPageState extends State<RoomPage> {
               return snapshot.hasData
                   ? Container(
                       color: Color(0xff2A2237),
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20, top: 10),
-                          child: Text(
-                            "Chat Channels",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Expanded(
-                          child: RefreshIndicator(
-                            onRefresh: _handleRefresh,
-                            child: ListView.builder(
-                                itemCount: channelsCache.length,
-                                padding: const EdgeInsets.all(15.0),
-                                itemBuilder: (context, position) {
-                                  return Column(
-                                    children: <Widget>[
-                                      Divider(height: 5.0),
-                                      ListTile(
-                                        leading: Icon(
-                                          Icons.message,
-                                          color: currentChannel == channelsCache[position]  ? Colors.purple[200] : Colors.white,
-                                        ),
-                                        title: Text(
-                                          '${channelsCache[position].channelName}',
-                                          style: new TextStyle(
-                                            fontSize: 20.0,
-                                            color: currentChannel == channelsCache[position] ? Colors.purple[200] : Colors.white,
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20, top: 10),
+                              child: Text(
+                                "Chat Channels",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Expanded(
+                              child: RefreshIndicator(
+                                onRefresh: _handleRefresh,
+                                child: ListView.builder(
+                                    itemCount: channelsCache.length,
+                                    padding: const EdgeInsets.all(15.0),
+                                    itemBuilder: (context, position) {
+                                      return Column(
+                                        children: <Widget>[
+                                          Divider(height: 5.0),
+                                          ListTile(
+                                            leading: Icon(
+                                              Icons.message,
+                                              color: currentChannel ==
+                                                      channelsCache[position]
+                                                  ? Colors.purple[200]
+                                                  : Colors.white,
+                                            ),
+                                            title: Text(
+                                              '${channelsCache[position].channelName}',
+                                              style: new TextStyle(
+                                                fontSize: 20.0,
+                                                color: currentChannel ==
+                                                        channelsCache[position]
+                                                    ? Colors.purple[200]
+                                                    : Colors.white,
+                                              ),
+                                            ),
+                                            onTap: () => _onTapItem(context,
+                                                channelsCache[position]),
                                           ),
-                                        ),
-                                        onTap: () => _onTapItem(
-                                            context, channelsCache[position]),
-                                      ),
-                                    ],
-                                  );
-                                }),
-                          ),
-                        ),
-                      ])) // return the ListView widget
+                                        ],
+                                      );
+                                    }),
+                              ),
+                            ),
+                          ])) // return the ListView widget
                   : Container(
                       color: Color(0xff2A2237),
                       child: Center(child: CircularProgressIndicator()));
@@ -212,13 +227,31 @@ class _RoomPageState extends State<RoomPage> {
             Flexible(
               child: Container(
                   color: Color(0xff2A2237),
-                  child: ListView.builder(
-                    itemCount: msgCache.length,
-                    controller: _scrollController,
-                    reverse: true,
-                    padding: const EdgeInsets.all(15.0),
-                    itemBuilder: (context, position) =>
-                        buildMessage(position, msgCache[position]),
+                  child: Column(
+                    children: <Widget>[
+                      isSocketConnected
+                          ? SizedBox()
+                          : SizedBox(
+                              width: double.infinity,
+                              child: Container(
+                                  color: Colors.redAccent,
+                                  child: Center(
+                                      child: Text(
+                                    "Connecting...",
+                                    style: TextStyle(color: Colors.white),
+                                  ))),
+                            ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: msgCache.length,
+                          controller: _scrollController,
+                          reverse: true,
+                          padding: const EdgeInsets.all(15.0),
+                          itemBuilder: (context, position) =>
+                              buildMessage(position, msgCache[position]),
+                        ),
+                      ),
+                    ],
                   )), // return the ListView widget
             ),
             Container(
@@ -235,7 +268,8 @@ class _RoomPageState extends State<RoomPage> {
                           style: TextStyle(color: Colors.white, fontSize: 16.0),
                           decoration: InputDecoration.collapsed(
                             hintText: 'Type your message...',
-                            hintStyle: TextStyle(fontSize: 16, color: Colors.white),
+                            hintStyle:
+                                TextStyle(fontSize: 16, color: Colors.white),
                           ),
                         ),
                       ),
@@ -250,6 +284,9 @@ class _RoomPageState extends State<RoomPage> {
                         icon: new Icon(Icons.send),
                         onPressed: () {
                           String msgContents = _messageController.text;
+
+                          if (msgContents.isEmpty) return;
+
                           _messageController.text = "";
                           DateTime now = DateTime.now();
                           String formattedDate =
@@ -307,25 +344,45 @@ class _RoomPageState extends State<RoomPage> {
 
   buildMessage(int position, MessageModel msg) {
     if (userID == msg.userID) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+      return Column(
         children: <Widget>[
-          Divider(height: 5.0),
-          Container(
-            width: 300.0,
-            padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-            margin: EdgeInsets.only(bottom: 20.0, right: 10.0),
-            decoration: BoxDecoration(
-                color: Colors.deepPurple[300],
-                borderRadius: BorderRadius.circular(8.0)),
-            child: Text(
-              '${msg.messageContent}',
-              style: new TextStyle(
-                fontSize: 16.0,
-                color: Colors.white,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Divider(height: 5.0),
+              GestureDetector(
+                onTap: () {
+                 setState(() {
+                   if(showDateIndex == position)
+                     showDateIndex = -1;
+                   else
+                    showDateIndex = position;
+                 });
+                },
+                child: Container(
+                  width: 300.0,
+                  padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                  margin: EdgeInsets.only(bottom: 20.0, right: 10.0),
+                  decoration: BoxDecoration(
+                      color: Colors.purple[300],
+                      borderRadius: BorderRadius.circular(8.0)),
+                  child: Text(
+                    '${msg.messageContent}',
+                    style: new TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
+          showDateIndex == position
+              ? Padding( child: Text(
+                  msg.sendDate,
+                  style: TextStyle(color: Colors.white),
+                ), padding: EdgeInsets.only(bottom: 15))
+              : Container()
         ],
       );
     } else {
@@ -337,7 +394,7 @@ class _RoomPageState extends State<RoomPage> {
             padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
             margin: EdgeInsets.only(bottom: 20.0, right: 10.0),
             decoration: BoxDecoration(
-                color: Colors.teal[400],
+                color: Colors.deepPurple[400],
                 borderRadius: BorderRadius.circular(8.0)),
             child: ListTile(
               title: Text(
