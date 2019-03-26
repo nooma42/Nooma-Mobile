@@ -58,5 +58,9 @@ Future<LoginModel> requestAuthenticate(BuildContext context, String email, Strin
         "Connection to the server could not be made. Please try again.",
         "OK");
   }
-
+  catch (e) {
+    showDialogSingleButton(context, "Unable to Connect",
+        "Connection to the server could not be made. Please try again.",
+        "OK");
+  }
 }

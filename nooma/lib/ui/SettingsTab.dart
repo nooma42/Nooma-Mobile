@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsTab extends StatelessWidget {
   SettingsTab();
@@ -9,18 +10,23 @@ class SettingsTab extends StatelessWidget {
       body: SafeArea(
         child: SizedBox.expand(
           child: Container(
-            color: Colors.redAccent,
+            color: Color(0xff2A2237),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 Align(
                   alignment: FractionalOffset.bottomCenter,
                   child: MaterialButton(
-                    height: 40.0,
+                    height: 50.0,
+                    minWidth: 400,
+
+                    color: Colors.red,
                     child:
                         Text('Logout', style: TextStyle(color: Colors.white)),
-                    onPressed: () {
-                      Navigator.pushNamed(context, "/LoginPage");
+                    onPressed: () async {
+                      SharedPreferences preferences = await SharedPreferences.getInstance();
+                      preferences.clear();
+                      Navigator.of(context).pushReplacementNamed("/LoginPage");
                     },
                   ),
                 )

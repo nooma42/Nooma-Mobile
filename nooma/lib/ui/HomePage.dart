@@ -35,7 +35,17 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar:new Theme(
+        data: Theme.of(context).copyWith(
+      // sets the background color of the `BottomNavigationBar`
+        canvasColor: Color(0xff1f1c29),
+        // sets the active color of the `BottomNavigationBar` if `Brightness` is light
+        primaryColor: Colors.deepPurpleAccent,
+        textTheme: Theme
+            .of(context)
+            .textTheme
+            .copyWith(caption: new TextStyle(color: Colors.grey))),
+    child: BottomNavigationBar(
         currentIndex: _currentIndex, // this will be set when a new tab is tapped
         onTap: onTabTapped,
         items: [
@@ -48,7 +58,7 @@ class _HomePageState extends State<HomePage> {
               title: Text('Settings')
           )
         ],
-      ),
+      ),),
       backgroundColor: Colors.white,
       body: _children[_currentIndex],
     );

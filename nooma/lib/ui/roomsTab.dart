@@ -42,7 +42,20 @@ class _PlaceholderWidgetState extends State<PlaceholderWidget> {
         Form(
           key: _formKey,
           child: Container(
-            color: Colors.deepPurple[400],
+            decoration: new BoxDecoration(
+                color: Colors.deepPurple[400],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.white,
+                  blurRadius: 20.0, // has the effect of softening the shadow
+                  spreadRadius: 10.0, // has the effect of extending the shadow
+                  offset: Offset(
+                    10.0, // horizontal, move right 10
+                    100.0, // vertical, move down 10
+                  ),
+                )
+              ]),
+
             height: 150.0,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -55,18 +68,22 @@ class _PlaceholderWidgetState extends State<PlaceholderWidget> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 5.0),
-                  child: MaterialButton(
-                    elevation: 1.0,
-                    minWidth: 200.0,
-                    height: 42.0,
-                    child:
-                        Text('Join Room', style: TextStyle(color: Colors.black)),
-                    onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        joinRoom(_joinCodeController);
-                      }
-                    },
-                    color: Colors.greenAccent,
+                  child: Container(
+                    height: 45,
+                    width: 210,
+                    child: RaisedButton(
+                      elevation: 1.0,
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(10.0)),
+                      child:
+                          Text('Join Room', style: TextStyle(color: Colors.black,letterSpacing: 0.3, fontSize: 16)),
+                      onPressed: () {
+                        if (_formKey.currentState.validate()) {
+                          joinRoom(_joinCodeController);
+                        }
+                      },
+                      color: Colors.tealAccent[200],
+                    ),
                   ),
                 ),
               ],

@@ -1,1 +1,4 @@
-String ipAddress = "10.188.76.126:9001";
+String ipAddress = "10.211.67.2:9001";
+
+String userID = "";
+String username = "";

@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nooma/ui/LoginPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nooma/globals.dart' as globals;
+
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -12,9 +15,37 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
 
+
+  Future<bool> checkPreferences() async {
+    //if preferences are set, take user to home and not login; they are already logged in
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = await prefs.get('username');
+    var userID = await prefs.get('userID');
+
+    //print(username + " - " + userID);
+
+    if(userID != null && userID.length > 0)
+      {
+        return true;
+      }
+      if (username != null && username.length > 0)
+      {
+        return true;
+      }
+
+    globals.userID = userID;
+    globals.username = username;
+      return false;
+  }
   void goToLogin()
   {
-    Navigator.of(context).pushReplacementNamed('/LoginPage');
+    checkPreferences().then((hasPrefs){
+      print("has prefs: " + hasPrefs.toString());
+      if (!hasPrefs)
+        Navigator.of(context).pushReplacementNamed('/LoginPage');
+      else
+        Navigator.of(context).pushReplacementNamed('/HomePage');
+    });
   }
 
   @override

@@ -31,7 +31,7 @@ class _RoomPageState extends State<RoomPage> {
   TabController tabController;
   var appBarTitleText = new Text("Channel");
   Future<List<ChannelModel>> channels;
-  List<ChannelModel> channelsCache;
+  List<ChannelModel> channelsCache = new List<ChannelModel>();
 
   SocketIO socket;
   SocketIOManager manager;
@@ -73,15 +73,6 @@ class _RoomPageState extends State<RoomPage> {
       connectChannel(currentChannel.channelID);
     });
 
-    //socketIO.connect().then((onValue){
-    //String jsonData = '{"channelID": "$channelID"}';
-    //socketIO.sendMessage("channel", jsonData, _onChannelJoin);
-    //});
-
-    //String jsonData = '{"channelID": "$channelID"}';
-    // socketIO.sendMessage("channel", jsonData, _onChannelJoin);
-    //socketIO.subscribe("chat", _onReceiveChatMessage);
-
     socket.on("chat", (data) {
       print("recieved chat!");
       _onReceiveChatMessage(data);
@@ -95,7 +86,7 @@ class _RoomPageState extends State<RoomPage> {
     super.initState();
     readLocal();
 
-    channels = requestGetChannels(room.roomID);
+    channels = requestGetChannels(context, room.roomID);
     channels.then((chnls) {
       channelsCache = chnls;
       currentChannel = chnls[0];
@@ -162,33 +153,38 @@ class _RoomPageState extends State<RoomPage> {
               return snapshot.hasData
                   ? Container(
                       color: Color(0xff2A2237),
-                      child: ListView.builder(
-                          itemCount: channelsCache.length,
-                          padding: const EdgeInsets.all(15.0),
-                          itemBuilder: (context, position) {
-                            return Column(
-                              children: <Widget>[
-                                Divider(height: 5.0),
-                                ListTile(
-                                  leading: Icon(
-                                    Icons.message,
-                                    color: Colors.white,
-                                  ),
-                                  title: Text(
-                                    '${channelsCache[position].channelName}',
-                                    style: new TextStyle(
-                                      fontSize: 20.0,
+                      child: RefreshIndicator(
+                        onRefresh: _handleRefresh,
+                        child: ListView.builder(
+                            itemCount: channelsCache.length,
+                            padding: const EdgeInsets.all(15.0),
+                            itemBuilder: (context, position) {
+                              return Column(
+                                children: <Widget>[
+                                  Divider(height: 5.0),
+                                  ListTile(
+                                    leading: Icon(
+                                      Icons.message,
                                       color: Colors.white,
                                     ),
+                                    title: Text(
+                                      '${channelsCache[position].channelName}',
+                                      style: new TextStyle(
+                                        fontSize: 20.0,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    onTap: () => _onTapItem(
+                                        context, channelsCache[position]),
                                   ),
-                                  onTap: () => _onTapItem(
-                                      context, channelsCache[position]),
-                                ),
-                              ],
-                            );
-                          }),
+                                ],
+                              );
+                            }),
+                      ),
                     ) // return the ListView widget
-                  : Center(child: CircularProgressIndicator());
+                  :  Container(
+                      color: Color(0xff2A2237),
+                      child:Center(child: CircularProgressIndicator()));
             },
           ),
         ),
@@ -217,10 +213,10 @@ class _RoomPageState extends State<RoomPage> {
                         padding: const EdgeInsets.only(left: 10),
                         child: TextField(
                           controller: _messageController,
-                          style: TextStyle(color: Colors.black, fontSize: 15.0),
+                          style: TextStyle(color: Colors.white, fontSize: 15.0),
                           decoration: InputDecoration.collapsed(
                             hintText: 'Type your message...',
-                            hintStyle: TextStyle(color: Colors.grey),
+                            hintStyle: TextStyle(color: Colors.white),
                           ),
                         ),
                       ),
@@ -248,10 +244,10 @@ class _RoomPageState extends State<RoomPage> {
                           print(sendMsg.userID);
                           requestSendMessage(sendMsg);
                         },
-                        color: Colors.black,
+                        color: Colors.white,
                       ),
                     ),
-                    color: Colors.white,
+                    color: Color(0xff1c2329),
                   ),
                 ],
               ),
@@ -259,8 +255,8 @@ class _RoomPageState extends State<RoomPage> {
               height: 50.0,
               decoration: new BoxDecoration(
                   border: new Border(
-                      top: new BorderSide(color: Colors.grey, width: 0.5)),
-                  color: Colors.white),
+                      top: new BorderSide(color: Colors.white70, width: 0.1)),
+                  color: Color(0xff1c2329)),
             ),
           ],
         ),
@@ -362,5 +358,14 @@ class _RoomPageState extends State<RoomPage> {
 
   void _onLayoutDone(Duration timeStamp) {
     _scaffoldKey.currentState.openDrawer();
+  }
+
+  Future<Null> _handleRefresh() async {
+    requestGetChannels(context, room.roomID).then((onValue) {
+      setState(() {
+        channelsCache = onValue;
+      });
+      return null;
+    });
   }
 }

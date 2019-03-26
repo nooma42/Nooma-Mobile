@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:nooma/functions/showDialogSingleButton.dart';
-import 'dart:convert';
+import 'dart:convert' show json, utf8;
 import 'package:nooma/globals.dart' as globals;
 
 import 'package:nooma/models/MessageModel.dart';
@@ -12,7 +12,7 @@ Future<List<MessageModel>> requestGetMessages(String channelID) async {
   final url = "http://${globals.ipAddress}/channelMessages/" +channelID;
 
   Map<String, String> requestHeaders = {
-    'Content-type': 'application/json',
+    'Content-type': 'application/json;charset=UTF-8',
     'Accept': 'application/json',
   };
 
@@ -22,7 +22,7 @@ Future<List<MessageModel>> requestGetMessages(String channelID) async {
   );
 
   if (response.statusCode == 200) {
-    final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
+    final parsed = json.decode(utf8.decode(response.bodyBytes)).cast<Map<String, dynamic>>();
 
     return parsed.map<MessageModel>((json) => MessageModel.fromJson(json)).toList();
   } else {
