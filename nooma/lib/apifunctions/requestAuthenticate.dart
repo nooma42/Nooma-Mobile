@@ -10,7 +10,7 @@ import 'package:nooma/globals.dart' as globals;
 import 'package:nooma/models/loginModel.dart';
 
 Future<LoginModel> requestAuthenticate(BuildContext context, String email, String password) async {
-  final url = "http://${globals.ipAddress}/authenticate";
+  final url = "${globals.ipAddress}/authenticate";
   Map<String, String> body = {
     'email': email,
     'pwd': password,
@@ -61,7 +61,7 @@ Future<LoginModel> requestAuthenticate(BuildContext context, String email, Strin
   }
   catch (e) {
     showDialogSingleButton(context, "Unable to Connect",
-        "Connection to the server could not be made. Please try again.",
+        "Connection to the server could not be made. Please try again." + e.toString(),
         "OK");
   }
 }

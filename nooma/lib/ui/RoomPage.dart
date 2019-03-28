@@ -66,7 +66,7 @@ class _RoomPageState extends State<RoomPage> {
     /*socketIO = new SocketIO("http://127.0.0.1:3000", "/chat",
         query: "userId=21031", socketStatusCallback: _socketStatus);*/
 
-    socket = await manager.createInstance("http://${globals.ipAddress}",
+    socket = await manager.createInstance("${globals.ipAddress}",
         query: {
           "auth": "--SOME AUTH STRING---",
           "info": "new connection from adhara-socketio",
@@ -386,33 +386,54 @@ class _RoomPageState extends State<RoomPage> {
         ],
       );
     } else {
-      return Row(
+      return Column(
         children: <Widget>[
-          Divider(height: 5.0),
-          Container(
-            width: 300,
-            padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-            margin: EdgeInsets.only(bottom: 20.0, right: 10.0),
-            decoration: BoxDecoration(
-                color: Colors.deepPurple[400],
-                borderRadius: BorderRadius.circular(8.0)),
-            child: ListTile(
-              title: Text(
-                '${msg.username}',
-                style: new TextStyle(
-                  fontSize: 20.0,
-                  color: Colors.white,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Divider(height: 5.0),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if(showDateIndex == position)
+                      showDateIndex = -1;
+                    else
+                      showDateIndex = position;
+                  });
+                },
+                child: Container(
+                  width: 300,
+                  padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                  margin: EdgeInsets.only(bottom: 20.0, right: 10.0),
+                  decoration: BoxDecoration(
+                      color: Colors.deepPurple[400],
+                      borderRadius: BorderRadius.circular(8.0)),
+                  child: ListTile(
+                    title: Text(
+                      '${msg.username}',
+                      style: new TextStyle(
+                        fontSize: 20.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${msg.messageContent}',
+                      style: new TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              subtitle: Text(
-                '${msg.messageContent}',
-                style: new TextStyle(
-                  fontSize: 16.0,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+            ],
           ),
+          showDateIndex == position
+              ? Padding( child: Text(
+            msg.sendDate,
+            style: TextStyle(color: Colors.white),
+          ), padding: EdgeInsets.only(bottom: 15))
+              : Container()
         ],
       );
     }

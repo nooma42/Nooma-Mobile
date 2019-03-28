@@ -14,7 +14,7 @@ import 'package:nooma/ui/RoomPage.dart';
 
 Future<JoinRoomModel> requestRegister(BuildContext context, String firstName,
     String lastName, String email, String pwd) async {
-  final url = "http://${globals.ipAddress}/users";
+  final url = "${globals.ipAddress}/users";
 
   Map<String, String> body = {
     'firstName': firstName,

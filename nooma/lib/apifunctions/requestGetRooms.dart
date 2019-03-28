@@ -15,7 +15,7 @@ Future<List<RoomModel>> requestGetRooms(BuildContext context, String userID) asy
   //get userID from the shared prefs to use in URL param
   SharedPreferences preferences = await SharedPreferences.getInstance();
 
-  final url = "http://${globals.ipAddress}/studentRooms/" + globals.userID;
+  final url = "${globals.ipAddress}/studentRooms/" + globals.userID;
   print("url:  " + url);
 
   Map<String, String> requestHeaders = {

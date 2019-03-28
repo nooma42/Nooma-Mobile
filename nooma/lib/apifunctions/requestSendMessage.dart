@@ -9,7 +9,7 @@ import 'package:nooma/models/MessageModel.dart';
 import 'package:nooma/models/SendMessageModel.dart';
 
 void requestSendMessage(SendMessageModel sendMsg) async {
-  final url = "http://${globals.ipAddress}/channelMessages/" + sendMsg.channelID;
+  final url = "${globals.ipAddress}/channelMessages/" + sendMsg.channelID;
 
   Map<String, String> requestHeaders = {
     'Content-type': 'application/json',

@@ -1,4 +1,4 @@
-String ipAddress = "10.211.67.2:9001";
+String ipAddress = "https://noomamiddleware.azurewebsites.net";
 
 String userID = "";
 String username = "";

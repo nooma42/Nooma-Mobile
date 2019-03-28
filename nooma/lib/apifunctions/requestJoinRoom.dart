@@ -13,7 +13,7 @@ import 'package:nooma/ui/RoomPage.dart';
 
 Future<JoinRoomModel> requestJoinRoom(
     BuildContext context, String userID, String joinCode) async {
-  final url = "http://${globals.ipAddress}/joinRoom";
+  final url = "${globals.ipAddress}/joinRoom";
 
   Map<String, String> body = {
     'userID': userID,

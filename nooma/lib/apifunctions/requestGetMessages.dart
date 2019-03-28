@@ -9,7 +9,7 @@ import 'package:nooma/models/MessageModel.dart';
 import 'dart:convert' show utf8;
 
 Future<List<MessageModel>> requestGetMessages(String channelID) async {
-  final url = "http://${globals.ipAddress}/channelMessages/" +channelID;
+  final url = "${globals.ipAddress}/channelMessages/" +channelID;
 
   Map<String, String> requestHeaders = {
     'Content-type': 'application/json;charset=UTF-8',
