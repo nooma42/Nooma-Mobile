@@ -18,7 +18,8 @@ class JoinCodeWidget extends StatelessWidget {
       autovalidate: false,
       validator: (value) {
         if (value.length != 8) {
-          return ('Invalid Join Code');
+          return null;
+          //return ('Invalid Join Code');
         }
       },
       decoration: InputDecoration(

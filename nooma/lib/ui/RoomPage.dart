@@ -57,7 +57,7 @@ class _RoomPageState extends State<RoomPage> {
 
   bool isSocketConnected = false;
 
-  var showDateIndex = 0;
+  var showDateIndex = -1;
 
   _RoomPageState(this.room);
 
@@ -389,7 +389,6 @@ class _RoomPageState extends State<RoomPage> {
       return Column(
         children: <Widget>[
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               Divider(height: 5.0),
               GestureDetector(

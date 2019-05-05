@@ -40,8 +40,8 @@ Future<List<RoomModel>> requestGetRooms(BuildContext context, String userID) asy
     }
   }
   catch (e) {
-    showDialogSingleButton(context, "Unable to Get Room List",
-        "Something has gone horribly wrong!", "OK");
+    showDialogSingleButton(context, "Connection Timed Out!",
+        "Unable to Get Room List! Pull down to try again.", "OK");
     return new List<RoomModel>();
   }
 }

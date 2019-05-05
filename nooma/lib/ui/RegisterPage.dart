@@ -85,6 +85,9 @@ class _RegisterPageState extends State<RegisterPage> {
         if (value.length == 0) {
           return ('Please enter your First Name.');
         }
+        if (value.length > 50) {
+          return ('First Name Too Long.');
+        }
       },
       decoration: inputStyle("First Name"),
     );
@@ -106,6 +109,9 @@ class _RegisterPageState extends State<RegisterPage> {
       validator: (value) {
         if (value.length == 0) {
           return ('Please enter your Last Name.');
+        }
+        if (value.length > 50) {
+          return ('Last Name Too Long.');
         }
       },
       decoration: inputStyle("Last Name"),
@@ -157,6 +163,9 @@ class _RegisterPageState extends State<RegisterPage> {
         if (value.length < 8) {
           return ('Your password must be at least 8 characters.');
         }
+        if (value.length > 50) {
+          return ('Your password must be less than 50 characters.');
+          }
       },
       decoration: inputStyle("Password"),
     );
