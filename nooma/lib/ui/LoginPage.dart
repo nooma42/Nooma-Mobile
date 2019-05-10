@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:nooma/apifunctions/requestAuthenticate.dart';
-
+import 'package:nooma/functions/LoginValidator.dart';
 class overscrollDisable extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
@@ -74,11 +74,7 @@ class _LoginPageState extends State<LoginPage> {
           autofocus: false,
           controller: emailController,
           focusNode: emailFocusNode,
-          validator: (value) {
-            if (value.length == 0) {
-              return ('Please enter your email address');
-            }
-          },
+          validator: LoginValidator.validateEmail,
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (term) {
             FocusScope.of(context).requestFocus(passwordFocusNode);
@@ -121,11 +117,7 @@ class _LoginPageState extends State<LoginPage> {
           autofocus: false,
           focusNode: passwordFocusNode,
           textInputAction: TextInputAction.done,
-          validator: (value) {
-            if (value.length == 0) {
-              return ('Please enter your password');
-            }
-          },
+          validator: LoginValidator.validatePassword,
           style: TextStyle(
             color: Colors.white,
             fontSize: 17,

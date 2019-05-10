@@ -17,6 +17,7 @@ void requestSendMessage(SendMessageModel sendMsg) async {
   };
 
   Map<String, dynamic> body = sendMsg.toJson();
+  print(body);
 
   final response = await http.post(
     url,

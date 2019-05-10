@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nooma/ui/RegisterPage.dart';
+import 'package:nooma/ui/SetPasswordPage.dart';
 import 'ui/LoginPage.dart';
 import 'ui/SplashScreen.dart';
 import 'ui/HomePage.dart';
@@ -11,6 +12,7 @@ var routes = <String, WidgetBuilder>{
   "/LoginPage": (BuildContext context) => LoginPage(),
   "/HomePage": (BuildContext context) => HomePage(),
   "/RegisterPage": (BuildContext context) => RegisterPage(),
+  "/SetPasswordPage": (BuildContext context) => SetPasswordPage(),
 };
 void main() => runApp(Nooma());
 

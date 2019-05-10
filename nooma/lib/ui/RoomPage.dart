@@ -29,6 +29,8 @@ class RoomPage extends StatefulWidget {
 class _RoomPageState extends State<RoomPage> {
   var selectedIndex = 0;
 
+  var anonymousMessaging = false;
+
   RoomModel room;
   TabController tabController;
   var appBarTitleText = new Text("");
@@ -62,10 +64,6 @@ class _RoomPageState extends State<RoomPage> {
   _RoomPageState(this.room);
 
   _connectSocket() async {
-    //update your domain before using
-    /*socketIO = new SocketIO("http://127.0.0.1:3000", "/chat",
-        query: "userId=21031", socketStatusCallback: _socketStatus);*/
-
     socket = await manager.createInstance("${globals.ipAddress}",
         query: {
           "auth": "--SOME AUTH STRING---",
@@ -89,6 +87,11 @@ class _RoomPageState extends State<RoomPage> {
     socket.on("chat", (data) {
       print("recieved chat!");
       _onReceiveChatMessage(data);
+    });
+
+    socket.on("delete", (data) {
+      print("recieved delete command!");
+      _onReceiveDeleteMessage(data);
     });
     socket.connect();
   }
@@ -243,13 +246,12 @@ class _RoomPageState extends State<RoomPage> {
                             ),
                       Expanded(
                         child: ListView.builder(
-                          itemCount: msgCache.length,
-                          controller: _scrollController,
-                          reverse: true,
-                          padding: const EdgeInsets.all(15.0),
-                          itemBuilder: (context, position) =>
-                              buildMessage(position, msgCache[position]),
-                        ),
+                            itemCount: msgCache.length,
+                            controller: _scrollController,
+                            reverse: true,
+                            padding: const EdgeInsets.all(15.0),
+                            itemBuilder: (context, position) =>
+                                buildMessage(position, msgCache[position])),
                       ),
                     ],
                   )), // return the ListView widget
@@ -275,7 +277,44 @@ class _RoomPageState extends State<RoomPage> {
                       ),
                     ),
                   ),
+                  Material(
+                      child: new Container(
+                    child: IconButton(
+                      icon: new Icon(anonymousMessaging
+                          ? Icons.visibility_off
+                          : Icons.visibility),
+                      onPressed: () {
+                        setState(() {
+                          anonymousMessaging = !anonymousMessaging;
 
+                          if (anonymousMessaging) {
+                            Fluttertoast.showToast(
+                                msg: "Anonymous Messaging On",
+                                toastLength: Toast.LENGTH_LONG,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIos: 2,
+                                backgroundColor: Colors.deepPurpleAccent,
+                                textColor: Colors.white,
+                                fontSize: 16.0
+                            );
+                          }
+                          else {
+                            Fluttertoast.showToast(
+                                msg: "Anonymous Messaging Off",
+                                toastLength: Toast.LENGTH_LONG,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIos: 2,
+                                backgroundColor: Colors.deepPurpleAccent,
+                                textColor: Colors.white,
+                                fontSize: 16.0
+                            );
+                          }
+                        });
+                      },
+                      color: Colors.white,
+                    ),
+                    color: Color(0xff1c2329),
+                  )),
                   // Button send message
                   Material(
                     child: new Container(
@@ -285,7 +324,9 @@ class _RoomPageState extends State<RoomPage> {
                         onPressed: () {
                           String msgContents = _messageController.text;
 
+                          //validate the message is within length bounds
                           if (msgContents.isEmpty) return;
+                          if (msgContents.length > 255) return;
 
                           _messageController.text = "";
                           DateTime now = DateTime.now();
@@ -296,7 +337,9 @@ class _RoomPageState extends State<RoomPage> {
                               userID,
                               currentChannel.channelID,
                               msgContents,
-                              formattedDate);
+                              formattedDate,
+                              anonymousMessaging.toString()
+                          );
                           print(sendMsg.userID);
                           requestSendMessage(sendMsg);
                         },
@@ -328,6 +371,15 @@ class _RoomPageState extends State<RoomPage> {
     print("*** connection:" + message + " ***");
   }
 
+  void _onReceiveDeleteMessage(data) {
+    print(data);
+
+    setState(() {
+      msgCache.removeWhere(
+          (item) => item.messageID == data['messageID'].toString());
+    });
+  }
+
   void _onReceiveChatMessage(dynamic message) {
     print(message);
     MessageModel newMsg = MessageModel.fromJson(message);
@@ -352,12 +404,12 @@ class _RoomPageState extends State<RoomPage> {
               Divider(height: 5.0),
               GestureDetector(
                 onTap: () {
-                 setState(() {
-                   if(showDateIndex == position)
-                     showDateIndex = -1;
-                   else
-                    showDateIndex = position;
-                 });
+                  setState(() {
+                    if (showDateIndex == position)
+                      showDateIndex = -1;
+                    else
+                      showDateIndex = position;
+                  });
                 },
                 child: Container(
                   width: 300.0,
@@ -378,10 +430,12 @@ class _RoomPageState extends State<RoomPage> {
             ],
           ),
           showDateIndex == position
-              ? Padding( child: Text(
-                  msg.sendDate,
-                  style: TextStyle(color: Colors.white),
-                ), padding: EdgeInsets.only(bottom: 15))
+              ? Padding(
+                  child: Text(
+                    msg.sendDate,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  padding: EdgeInsets.only(bottom: 15))
               : Container()
         ],
       );
@@ -394,7 +448,7 @@ class _RoomPageState extends State<RoomPage> {
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    if(showDateIndex == position)
+                    if (showDateIndex == position)
                       showDateIndex = -1;
                     else
                       showDateIndex = position;
@@ -428,10 +482,12 @@ class _RoomPageState extends State<RoomPage> {
             ],
           ),
           showDateIndex == position
-              ? Padding( child: Text(
-            msg.sendDate,
-            style: TextStyle(color: Colors.white),
-          ), padding: EdgeInsets.only(bottom: 15))
+              ? Padding(
+                  child: Text(
+                    msg.sendDate,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  padding: EdgeInsets.only(bottom: 15))
               : Container()
         ],
       );

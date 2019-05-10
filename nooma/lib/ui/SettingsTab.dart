@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nooma/ui/SetPasswordPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nooma/globals.dart' as globals;
 
@@ -37,7 +38,7 @@ class SettingsTab extends StatelessWidget {
                  Material(
                    color: Colors.deepPurple[400],
                     child: ListTile(
-                      onTap: () => changePassword(),
+                      onTap: () => changePassword(context),
                       trailing: Icon(Icons.arrow_forward_ios, color:Colors.white),
                       title: Text('Change Password', style: TextStyle(fontSize: 20, color: Colors.white),),
                     ),
@@ -56,7 +57,9 @@ class SettingsTab extends StatelessWidget {
                     onPressed: () async {
                       SharedPreferences preferences = await SharedPreferences.getInstance();
                       preferences.clear();
-                      Navigator.of(context).pushReplacementNamed("/LoginPage");
+                      Navigator.of(context)
+                          .pushNamedAndRemoveUntil('/LoginPage', (Route<dynamic> route) => false);
+                      //Navigator.of(context).pushReplacementNamed("/LoginPage");
                     },
                   ),
                 )
@@ -68,7 +71,11 @@ class SettingsTab extends StatelessWidget {
     );
   }
 
-  changePassword() {
-    print("tap!");
+  changePassword(context) {
+    Navigator.push(
+        context,
+        new MaterialPageRoute(
+          builder: (BuildContext context) => new SetPasswordPage(),
+        ));
   }
 }

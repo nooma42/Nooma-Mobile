@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nooma/apifunctions/requestAuthenticate.dart';
 import 'package:nooma/apifunctions/requestRegister.dart';
+import 'package:nooma/functions/RegisterValidator.dart';
 
 
 class RegisterPage extends StatefulWidget {
@@ -81,14 +82,7 @@ class _RegisterPageState extends State<RegisterPage> {
         color: Colors.white,
         fontSize: 18,
       ),
-      validator: (value) {
-        if (value.length == 0) {
-          return ('Please enter your First Name.');
-        }
-        if (value.length > 50) {
-          return ('First Name Too Long.');
-        }
-      },
+      validator: RegisterValidator.validateFirstName,
       decoration: inputStyle("First Name"),
     );
 
@@ -106,14 +100,7 @@ class _RegisterPageState extends State<RegisterPage> {
         color: Colors.white,
         fontSize: 18,
       ),
-      validator: (value) {
-        if (value.length == 0) {
-          return ('Please enter your Last Name.');
-        }
-        if (value.length > 50) {
-          return ('Last Name Too Long.');
-        }
-      },
+      validator: RegisterValidator.validateLastName,
       decoration: inputStyle("Last Name"),
     );
 
@@ -131,17 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
         color: Colors.white,
         fontSize: 18,
       ),
-      validator: (value) {
-        RegExp regExp = new RegExp(
-          r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
-          caseSensitive: false,
-          multiLine: false,
-        );
-        if(!regExp.hasMatch(value))
-          {
-            return "Please enter a valid email address.";
-          }
-      },
+      validator: RegisterValidator.validateEmail,
       decoration: inputStyle("Email"),
     );
 
@@ -159,14 +136,7 @@ class _RegisterPageState extends State<RegisterPage> {
         color: Colors.white,
         fontSize: 18,
       ),
-      validator: (value) {
-        if (value.length < 8) {
-          return ('Your password must be at least 8 characters.');
-        }
-        if (value.length > 50) {
-          return ('Your password must be less than 50 characters.');
-          }
-      },
+      validator: RegisterValidator.validatePassword,
       decoration: inputStyle("Password"),
     );
 
