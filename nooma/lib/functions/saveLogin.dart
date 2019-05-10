@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nooma/models/LoginModel.dart';
 import 'package:nooma/globals.dart' as globals;
 
-saveLogin(Map responseJSON) async {
+Future saveLogin(Map responseJSON) async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
 
   var username;

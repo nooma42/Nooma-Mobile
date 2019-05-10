@@ -27,8 +27,8 @@ class _LoginPageState extends State<LoginPage> {
   _LoginData _data = new _LoginData();
 
   final emailController =
-      TextEditingController(text: "tom_bradley123@hotmail.co.uk");
-  final pwdController = TextEditingController(text: "apple");
+      TextEditingController(text: "");
+  final pwdController = TextEditingController(text: "");
 
   FocusNode emailFocusNode = new FocusNode();
   FocusNode passwordFocusNode = new FocusNode();
